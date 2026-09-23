@@ -1,7 +1,11 @@
-.superpowers/
+.DS_Store
+node_modules/
+__pycache__/
+.local/
 .env
 .env.*
 !.env.example
-__pycache__/
+!.env.sample
+*.log
+.superpowers/
 .venv/
-node_modules/
