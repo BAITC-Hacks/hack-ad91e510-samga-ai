@@ -12,6 +12,7 @@ import {searchPlans} from '../analytics/search.mjs';
 import {evidenceFor} from '../analytics/evidence.mjs';
 import {districts,measures,indicators,groups} from '../docs/brief-analysis/dist/data.mjs';
 import {simulate as simulateBaseline} from '../docs/brief-analysis/dist/model.mjs';
+import {buildBrief,renderBriefHtml} from '../briefing/report.mjs';
 async function readJson(req){
  if(req.headers['content-type']?.split(';')[0].trim()!=='application/json')throw new ApiError(415,'CONTENT_TYPE','Используйте application/json.');
  const chunks=[];let size=0;
@@ -19,7 +20,7 @@ async function readJson(req){
  try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}
  catch{throw new ApiError(400,'INVALID_JSON','Некорректный JSON.');}
 }
-const postPaths=['/api/simulate','/api/analyze','/api/compare','/api/search','/api/facts','/api/evidence','/api/assistant'];
+const postPaths=['/api/simulate','/api/analyze','/api/compare','/api/search','/api/facts','/api/evidence','/api/assistant','/api/brief'];
 function baseline(){
  const {districts:districtSnapshots,...snapshot}=simulateBaseline([]);
  return {...snapshot,districts:districtSnapshots.map(({profile,...district})=>district)};
@@ -54,6 +55,10 @@ export function createApp(config={}){
    if(!postPaths.includes(req.url))throw new ApiError(404,'NOT_FOUND','Маршрут не найден.');
    if(req.method!=='POST'){res.setHeader('Allow','POST');throw new ApiError(405,'METHOD_NOT_ALLOWED','Используйте POST.');}
    const input=await readJson(req);
+   if(req.url==='/api/brief'){
+    only(input,['choices','comparisonChoices','title']);
+    const brief=buildBrief(input);return send(200,{brief,html:renderBriefHtml(brief)});
+   }
    if(req.url==='/api/simulate'){
     const errors=validateSchema(input,simulateSchema);
     if(errors.length)throw new ApiError(422,'VALIDATION_ERROR','Проверьте решения.',errors);

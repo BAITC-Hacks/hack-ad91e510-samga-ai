@@ -36,7 +36,8 @@ export function initPlanner({onState,onMap}){
  function renderCatalog(state){
   $('catalog-filter').innerHTML=[['','Все меры'],...Object.entries(state.catalog.groups)].map(([id,name])=>`<button data-filter="${id}" class="${filter===id?'active':''}" aria-pressed="${filter===id}">${esc(name)}</button>`).join('');
   $('measure-catalog').innerHTML=state.catalog.measures.filter(m=>!filter||m.group===filter).map(m=>{
-   const district=districtChoices.get(m.id)||'',chosen=state.choices.some(c=>c.id===m.id);
+   const selected=state.choices.find(c=>c.id===m.id);
+   const district=selected?.district??districtChoices.get(m.id)??'',chosen=Boolean(selected);
    const choice=m.type==='district'?{id:m.id,district}:{id:m.id};
    const reason=session.reason(choice);
    const effects=Object.entries(m.effects).map(([key,value])=>`${esc(state.catalog.indicators.find(i=>i.id===key).name)} ${delta(value)}`).join(' · ');
@@ -60,6 +61,7 @@ export function initPlanner({onState,onMap}){
   const s=state.simulation;if(!s)return;
   if(renderedResult!==s){
    renderedResult=s;const b=s.baseline,r=s.result;
+   $('open-briefing').href='/briefing/?plan='+encodeURIComponent(JSON.stringify(s.choices));
    $('result-overview').innerHTML=`<div class="result-overview"><div class="result-stat"><span>Индекс качества жизни / 100</span><div class="result-score-line"><span>${fmt(b.score)}</span><span>→</span><strong>${fmt(r.score)}</strong></div><p class="${tone(r.score-b.score)}">${delta(r.score-b.score)} балла к исходному состоянию</p></div><div class="result-stat"><span>Расход бюджета</span><strong>${r.cost} / 100</strong><p>В резерве ${100-r.cost}</p></div><div class="result-stat"><span>Критических показателей</span><strong>${b.critical} → ${r.critical}</strong><p>Значения строго ниже 40</p></div></div>`;
    $('district-comparison').innerHTML=table(['Район','До','После','Разница'],r.districts.map((d,i)=>[d.name,fmt(b.districts[i].score),fmt(d.score),`<span class="${tone(d.score-b.districts[i].score)}">${delta(d.score-b.districts[i].score)}</span>`]));
    $('result-district').innerHTML=r.districts.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');

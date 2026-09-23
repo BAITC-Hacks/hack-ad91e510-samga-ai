@@ -14,6 +14,10 @@ const cityAssets=new Map([
  ['/demos/astana-city/vendor/maplibre-gl.css',['vendor/maplibre-gl.css','text/css']]
 ]);
 const exact=new Map([
+ ['/briefing/',['../briefing/index.html','text/html']],
+ ['/briefing/app.mjs',['../briefing/app.mjs','text/javascript']],
+ ['/briefing/session.mjs',['../briefing/session.mjs','text/javascript']],
+ ['/briefing/style.css',['../briefing/style.css','text/css']],
  ['/analytics/',['../analytics/public/index.html','text/html']],
  ['/analytics/workbench.js',['../analytics/public/workbench.js','text/javascript']],
  ['/analytics/workbench.css',['../analytics/public/workbench.css','text/css']],
