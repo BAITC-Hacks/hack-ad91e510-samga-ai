@@ -105,6 +105,12 @@ export function initPlanner({onState,onMap}){
  $('change-plan').onclick=()=>{$('result-dialog').close();showPlan();};
  $('show-on-map').onclick=()=>{$('result-dialog').close();onMap();};
  for(const button of document.querySelectorAll('[data-close]'))button.onclick=()=>$(button.dataset.close).close();
- session.load();
+ session.load().then(()=>{
+  const encoded=new URL(location.href).searchParams.get('plan');
+  if(!encoded||!session.state.catalog)return;
+  let choices;
+  try{choices=encoded.length<=3000?JSON.parse(encoded):null;}catch{choices=null;}
+  session.importChoices(choices);showPlan();
+ });
  return session;
 }

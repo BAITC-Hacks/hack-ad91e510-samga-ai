@@ -49,6 +49,14 @@ export function createPlannerSession({request=apiRequest,onChange=()=>{}}={}){
   },
   remove(id){state.choices=state.choices.filter(c=>c.id!==id);invalidate();},
   clear(){state.choices=[];invalidate();},
+  importChoices(choices){
+   if(!state.catalog)return false;
+   const malformed=!Array.isArray(choices)||choices.some(c=>!c||typeof c!=='object'||Array.isArray(c)||Object.keys(c).some(k=>!['id','district'].includes(k)));
+   const errors=malformed?['Ссылка содержит некорректный план.']:validate(choices);
+   if(errors.length){state.error=errors.join(' ');changed();return false;}
+   state.choices=choices.map(c=>c.district===undefined?{id:c.id}:{id:c.id,district:c.district});
+   invalidate();return true;
+  },
   async calculate(){
    const errors=validate(state.choices);
    if(errors.length){state.error=errors.join(' ');changed();return;}

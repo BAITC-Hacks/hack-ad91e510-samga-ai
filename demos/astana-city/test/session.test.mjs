@@ -32,6 +32,14 @@ test('budget and category limits cannot be bypassed by choosing a district',asyn
  s.clear();s.add({id:'M7',district:'Нура'});s.add({id:'M8',district:'Нура'});
  assert.equal(s.add({id:'M9',district:'Нура'}),false);
 });
+test('opening an alternative validates the complete plan before replacing current choices',async()=>{
+ const s=await make();s.add({id:'M1',district:'Нура'});
+ assert.equal(s.importChoices([...example.slice(0,4),{id:'M7',district:'Есиль'}]),false);
+ assert.deepEqual(s.state.choices,[{id:'M1',district:'Нура'}]);
+ assert.equal(s.importChoices(example.map(c=>({...c,score:99}))),false);
+ assert.equal(s.importChoices(example),true);assert.equal(s.state.spent,95);
+ assert.equal(s.state.simulation,null);assert.equal(s.state.choices.length,5);
+});
 test('editing the plan invalidates an in-flight calculation',async()=>{
  const response=delay(),s=await make(()=>response.promise);
  example.forEach(c=>s.add(c));const pending=s.calculate();s.remove('M5');

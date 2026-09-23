@@ -42,8 +42,8 @@ export function createApp(config={}){
     res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');
    }
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
-   const path=new URL(req.url,'http://localhost').pathname;
-   if(req.method==='GET'&&path==='/'){res.writeHead(302,{Location:'/demos/astana-city/','Cache-Control':'no-store'});res.end();return;}
+   const requestUrl=new URL(req.url,'http://localhost'),path=requestUrl.pathname;
+   if(req.method==='GET'&&path==='/'){res.writeHead(302,{Location:'/demos/astana-city/'+requestUrl.search,'Cache-Control':'no-store'});res.end();return;}
    if(req.method==='GET'){
     const asset=await staticResponse(path);
     if(asset){res.writeHead(200,{'Content-Type':asset.type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(asset.body);return;}
@@ -105,6 +105,6 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  if(!['demo','openai'].includes(mode))throw new Error('AI_MODE must be openai or demo');
  if(!Number.isInteger(port)||port<1||port>65535)throw new Error('PORT must be 1..65535');
  const app=createApp({mode,apiKey:process.env.OPENAI_API_KEY,model:process.env.OPENAI_MODEL,
- frontendOrigin:process.env.FRONTEND_ORIGIN??'http://127.0.0.1:4193'});
- app.listen(port,'127.0.0.1',()=>console.log('SAMGA workbench http://127.0.0.1:'+port+' ('+mode+')'));
+ frontendOrigin:process.env.FRONTEND_ORIGIN??'http://127.0.0.1:4197'});
+ app.listen(port,'127.0.0.1',()=>console.log('SAMGA AI http://127.0.0.1:'+port+' ('+mode+')'));
 }

@@ -38,6 +38,12 @@ test('catalog includes the exact baseline without client profile fields',async t
  assert.ok(catalog.baseline.districts.every(district=>!Object.hasOwn(district,'profile')));
 });
 
+test('entry redirect preserves a plan selected in the briefing',async t=>{
+ const get=await start(t),response=await get('/?plan=%5B%5D');
+ assert.equal(response.status,302);
+ assert.equal(response.headers.get('location'),'/demos/astana-city/?plan=%5B%5D');
+});
+
 test('health reports configuration state without exposing configuration values',async t=>{
  const app=createApp({mode:'openai',apiKey:'not-a-real-secret',model:'test-model'});app.listen(0,'127.0.0.1');await once(app,'listening');
  t.after(()=>new Promise(resolve=>{app.close(resolve);app.closeAllConnections();}));
