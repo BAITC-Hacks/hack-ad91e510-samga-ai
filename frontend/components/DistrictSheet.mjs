@@ -1,0 +1,6 @@
+import { Icon } from './Icon.mjs';
+import { esc, fmt } from '../lib/format.mjs';
+import { selectionReason } from '../lib/scenario.mjs';
+export function DistrictSheet(measure, state) {
+  return `<div class="sheet-handle"></div><header class="sheet-header"><div><div class="eyebrow">РАЙОННОЕ РЕШЕНИЕ</div><h2 id="sheet-title">Где начнутся изменения?</h2></div><button class="icon-button" data-action="close-sheet" aria-label="Закрыть выбор района">${Icon('close')}</button></header><div class="sheet-content"><p class="sheet-project">${esc(measure.name)} <strong>${measure.cost} ед.</strong></p><p class="sheet-help">Выберите один район. Эффект мероприятия будет применён к его показателям.</p><div class="district-options">${state.data.baseline.districts.map(d => { const reason = selectionReason(state.choices, measure, state.data.measures, d.name); return `<button class="district-option" data-action="choose-district" data-id="${measure.id}" data-district="${esc(d.name)}" ${reason ? 'disabled' : ''}><span class="district-option-icon">${Icon('pin')}</span><span><strong>${esc(d.name)}</strong><small>${reason ? esc(reason) : `${fmt(d.pop*100,0)}% населения города`}</small></span><span class="district-option-score">${fmt(d.score,1)}</span>${Icon('plus')}</button>`; }).join('')}</div><p class="fine-print">Оценка района по исходным данным · шкала 0–100</p></div>`;
+}

@@ -1,0 +1,12 @@
+{
+  "name": "samga-civic-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node dev-server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "node test/browser.mjs"
+  },
+  "engines": { "node": ">=24" },
+  "devDependencies": { "playwright": "1.63.0" }
+}
