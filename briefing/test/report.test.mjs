@@ -52,3 +52,8 @@ test('export is autonomous, escapes supplied titles and exposes reproducible sou
  assert.ok(html.includes('M7'));
  assert.ok(html.includes('@media print'));
 });
+test('an executive summary never hides a smaller worsening behind four larger tradeoffs',()=>{
+ const b=buildBrief({choices:plan('cheap'),comparisonChoices:plan('capital')});
+ assert.ok(b.tradeoffs.length>4);
+ assert.ok(renderBriefHtml(b).includes('<strong>Нура · Разгрузка дорог</strong>'));
+});

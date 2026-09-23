@@ -16,7 +16,7 @@ async function request(path,body){
  if(!response.ok)throw new Error([data.error?.message,...(data.error?.details??[])].filter(Boolean).join(' ')||'Запрос не выполнен.');
  return data;
 }
-function lines(items,limit=4){return '<ul>'+items.slice(0,limit).map(m=>`<li><b>${esc(m.district)} · ${esc(m.name)}</b><span>${fmt(m.before)} → ${fmt(m.after)} (${signed(m.delta)})</span></li>`).join('')+'</ul>';}
+function lines(items,limit=4){return items.length?'<ul>'+items.slice(0,limit).map(m=>`<li><b>${esc(m.district)} · ${esc(m.name)}</b><span>${fmt(m.before)} → ${fmt(m.after)} (${signed(m.delta)})</span></li>`).join('')+'</ul>':'';}
 let lastBrief=null;
 const session=createBriefingSession({request,onChange:render});
 function render(s){
@@ -45,7 +45,7 @@ function render(s){
  $('districts').innerHTML='<div class="legend"><span>Черта — план сравнения</span><span>Полоса — выбранный план · шкала 0–100</span></div>'+b.districts.map(d=>`<div class="district-row"><b>${esc(d.name)}</b><div class="district-bar" style="--before:${d.before}%;--after:${d.after}%" role="img" aria-label="${esc(d.name)}: ${fmt(d.before)} → ${fmt(d.after)}"><i></i><b></b></div><span class="district-values">${fmt(d.before)} → <b>${fmt(d.after)}</b></span></div>`).join('');
  $('benefits').innerHTML=lines(b.improvements)||'<p>Улучшений нет.</p>';
  if(b.critical.resolved.length)$('benefits').innerHTML+=`<p class="positive">${b.critical.resolved.length} показателя вышли из критической зоны.</p>`;
- $('tradeoffs').innerHTML=(b.tradeoffs.length?lines(b.tradeoffs):'<p>Снижения показателей относительно плана сравнения нет.</p>')+(b.critical.remaining.length?`<p class="negative">Остаются ниже 40:</p>${lines(b.critical.remaining)}`:'<p class="positive">Значений ниже 40 не осталось.</p>')+`<p class="muted">${b.coverage.missing.length?'Без мер в направлении: '+esc(b.coverage.missing.join(', '))+'.':'Представлены все пять направлений.'} Ноль критических показателей не означает, что все проблемы решены.</p>`;
+ $('tradeoffs').innerHTML=(b.tradeoffs.length?lines(b.tradeoffs,Infinity):'<p>Снижения показателей относительно плана сравнения нет.</p>')+(b.critical.remaining.length?`<p class="negative">Остаются ниже 40:</p>${lines(b.critical.remaining,Infinity)}`:'<p class="positive">Значений ниже 40 не осталось.</p>')+`<p class="muted">${b.coverage.missing.length?'Без мер в направлении: '+esc(b.coverage.missing.join(', '))+'.':'Представлены все пять направлений.'} Ноль критических показателей не означает, что все проблемы решены.</p>`;
  $('measures').innerHTML=`<table><thead><tr><th>Мера</th><th>Где</th><th>Цена</th></tr></thead><tbody>${b.measures.map(m=>`<tr><td>${m.id} · ${esc(m.name)}</td><td>${esc(m.district)}</td><td>${m.cost}</td></tr>`).join('')}</tbody></table>`;
  $('decomposition').innerHTML='<h3 style="margin-top:20px">Из чего складывается изменение индекса</h3>'+b.decomposition.map(d=>`<div class="contribution"><span>${esc(d.name)}</span><b>${signed(d.contribution)}</b></div>`).join('');
  $('open-map').href='/?plan='+encodeURIComponent(JSON.stringify(b.scenario.choices));
