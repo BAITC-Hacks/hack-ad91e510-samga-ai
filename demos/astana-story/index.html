@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ASTANA — пять решений для города</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../astana-city/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="./style.css">
+  <script src="../astana-city/vendor/maplibre-gl.js" defer></script>
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <div id="map" aria-label="Трёхмерная карта Астаны"></div><div class="vignette"></div>
+  <header class="header">
+    <a class="brand" href="../astana-city/" aria-label="Открыть исходный макет Астаны"><span class="brand-icon">A<span>•</span></span><span>ASTANA<small>CITY LAB / SAMGA AI</small></span></a>
+    <span class="header-divider"></span><span class="project-title">Аким на 5 часов</span>
+    <span class="demo-tag"><i></i> Демонстрационный сценарий</span>
+    <button class="play-button" id="play"><span id="play-icon">▶</span><span id="play-label">Смотреть демо</span></button>
+  </header>
+  <main class="stage">
+    <section class="story" aria-label="Текущий шаг сценария">
+      <div class="chapter"><span id="phase-label">Ваш первый день в роли акима</span><span id="step-count">Начало</span></div>
+      <div class="story-copy" aria-live="polite" aria-atomic="true">
+        <h1 id="story-title">Город ждёт<br>ваших решений.</h1>
+        <p id="story-description">У вас 100 единиц бюджета. Выберите пять проектов и узнайте, как изменится жизнь в городе за два года.</p>
+        <div id="story-details" class="story-details"></div>
+      </div>
+      <div class="story-actions"><button class="primary" id="next">Начать выбор <span>→</span></button><button class="back" id="back" aria-label="Предыдущий шаг" disabled>←</button></div>
+      <p class="story-foot" id="story-foot">В демо пять решений уже подобраны. Пройдите их по шагам или включите показ.</p>
+    </section>
+    <aside class="pulse" aria-label="Результаты города">
+      <div class="pulse-heading"><span>Качество жизни</span><span class="data-pill" id="score-state">До решений</span></div>
+      <div class="score"><strong id="city-score">52,6</strong><span>/ 100</span></div>
+      <div class="score-note" id="score-note">Стартовая оценка города</div>
+      <div class="score-track"><i id="score-fill"></i></div>
+      <div class="district-labels"><span>Район</span><span id="district-column">Индекс</span></div>
+      <div id="districts" class="districts"></div>
+      <div class="critical"><span class="critical-dot"></span><div><strong id="critical-count">2 критических показателя</strong><p id="critical-note">Школы и медицина в Нуре — ниже 40.</p></div></div>
+      <button id="compare" class="compare" hidden>Сравнить с началом <span>↔</span></button>
+      <p class="model-note">Учебная модель · не городская статистика</p>
+    </aside>
+    <div class="map-legend"><i></i><span id="map-caption">Астана · пять районов в модели</span></div>
+    <div class="map-tools"><button id="overview" aria-label="Обзор города" title="Обзор города">⌖</button><button id="tilt" aria-label="Переключить 2D и 3D" aria-pressed="true">3D</button><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button></div>
+    <p id="map-status" class="map-status" role="status">Загружаем карту Астаны…</p>
+  </main>
+  <section class="control-deck" aria-label="План развития города">
+    <div class="deck-heading"><div><span class="plan-name">Город для каждого</span><span id="decisions-count">0 из 5 решений</span></div><div class="budget-label">Потрачено <strong id="budget">0</strong><span>/ 100</span><span class="remaining" id="remaining">Осталось 100</span></div></div>
+    <div class="decision-list" id="decisions"></div>
+    <div class="timeline-row"><span id="timeline-label">Сначала — план</span><div class="quarter-track" id="quarters" aria-label="Восемь кварталов"></div><span id="timeline-end">Затем — 2 года развития</span></div>
+  </section>
+  <footer><span>OpenStreetMap · размещение проектов условное</span><span id="play-status" role="status">Можно пройти весь сценарий вручную</span><button id="restart">Начать заново ↶</button></footer>
+  <noscript>Для демонстрации включите JavaScript.</noscript>
+</body>
+</html>
