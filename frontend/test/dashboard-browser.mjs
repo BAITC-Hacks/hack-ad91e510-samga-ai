@@ -15,7 +15,7 @@ try {
   browser=await chromium.launch({headless:true,...(chrome?{executablePath:chrome}:{})});
   const page=await browser.newPage({viewport:{width:1600,height:1080},reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(`${origin}/?map=2d`);
+  await page.goto(`${origin}/?map=2d#map`);
   await page.waitForSelector('#city-map');
   assert.equal(await page.locator('.district-terrain').count(),5);
   assert.match(await page.locator('.qol-instrument .score-ring').innerText(),/52,56/);
@@ -47,7 +47,7 @@ try {
   await page.locator('.scenario-dock [data-action="calculate"]').click();
   await page.waitForSelector('.result-comparison');
   await page.waitForFunction(()=>document.querySelector('.result-comparison strong')?.textContent==='56,54');
-  await go('home');
+  await go('map');
   assert.equal(await page.locator('[data-action="map-stage"][data-stage="after"]').getAttribute('aria-pressed'),'true');
   assert.match(await page.locator('.qol-instrument .score-ring').innerText(),/56,54/);
   assert.match(await page.locator('.critical-summary').innerText(),/0\s+критических/);

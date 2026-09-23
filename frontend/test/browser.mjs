@@ -20,10 +20,10 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   const go = async name => {
     const nav = await page.locator('.control-sidebar').isVisible() ? '.side-link' : '.tab';
-    await page.locator(`${nav}[href="#${name}"]`).click();
-    await page.waitForSelector(`${nav}[href="#${name}"][aria-current="page"]`);
+    const link=page.locator(`${nav}[href="#${name}"]`); if(await link.count()) await link.click(); else await page.evaluate(view=>location.hash=view,name);
+    await page.waitForSelector(`main[data-view="${name}"]`);
   };
-  await page.goto(`${origin}/?map=2d`);
+  await page.goto(`${origin}/?map=2d#map`);
   await page.waitForSelector('#city-map');
   assert.match(await page.locator('.score-ring').innerText(),/52,56/);
   await page.screenshot({path:`${output}/home-desktop.png`,fullPage:true});
@@ -44,7 +44,7 @@ try {
   assert.equal(await page.locator('.district-indicators .metric').count(),10);
   await page.screenshot({path:`${output}/districts-desktop.png`,fullPage:true});
   await page.setViewportSize({width:390,height:844});
-  await go('home');
+  await go('map');
   await page.screenshot({path:`${output}/home-mobile.png`,fullPage:true});
   await overflow();
   await go('decisions');
@@ -86,12 +86,12 @@ try {
   await page.evaluate(() => scrollTo(0,0));
   await page.screenshot({path:`${output}/districts-mobile.png`,fullPage:true});
   await page.setViewportSize({width:320,height:740});
-  for (const name of ['home','decisions','districts','result']) {
+  for (const name of ['map','decisions','districts','result']) {
     await go(name);
     await overflow();
   }
   await page.getByRole('link',{name:'Улучшить сценарий'}).click();
-  await page.locator('.selection-strip [data-action="remove"][data-id="M7"]').click();
+  await page.locator('.plan-summary [data-action="remove"][data-id="M7"]').click();
   await go('result');
   assert.equal(await page.locator('.result-comparison').count(),0,'Editing invalidates previous score');
   assert.match(await page.locator('.empty-state').innerText(),/4 из 5/);
@@ -105,7 +105,7 @@ try {
   await page.locator('.budget-ready [data-action="calculate"]').click();
   await page.waitForSelector('.result-comparison');
   await page.getByRole('link',{name:'Улучшить сценарий'}).click();
-  await page.locator('.selection-strip [data-action="remove"][data-id="M7"]').click();
+  await page.locator('.plan-summary [data-action="remove"][data-id="M7"]').click();
   await page.waitForTimeout(500);
   await go('result');
   assert.equal(await page.getByText('OLD_SCENARIO_ANALYSIS').count(),0);

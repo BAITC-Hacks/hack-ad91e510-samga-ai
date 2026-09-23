@@ -80,7 +80,7 @@ function addChoice(id, district, guided=false) {
   state.guideStage=guided?'confirmation':'problem';
   if(guided)state.guideLastChoice={id,...(measure.type==='district'?{district}:{})};
   if (sheet.open) sheet.close();
-  haptic(); saveChoices(); toast(`Добавлено: ${measure.name}${district ? ` · ${district}` : ''}`);
+  haptic(); saveChoices(); toast(`Добавлено: ${measure.name} · ${measure.type==='district'?district:'Весь город'}`);
   if(guided)focusGuide();
 }
 function focusGuide(){window.scrollTo({top:0,behavior:'instant'});document.querySelector('#content')?.focus({preventScroll:true});}
