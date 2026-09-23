@@ -1,7 +1,7 @@
 import {createServer} from 'node:http';
 import {randomUUID} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
-import {readFile} from 'node:fs/promises';
+import {staticResponse} from './static.mjs';
 import {analyze,ApiError} from './ai.mjs';
 import {assist} from './assistant.mjs';
 import {requestSchema,analysisSchema,simulateSchema,validateSchema,validateRequest} from './contracts.mjs';
@@ -11,6 +11,7 @@ import {defaultSelection,renderGroundedAnalysis} from '../analytics/grounding.mj
 import {searchPlans} from '../analytics/search.mjs';
 import {evidenceFor} from '../analytics/evidence.mjs';
 import {districts,measures,indicators,groups} from '../docs/brief-analysis/dist/data.mjs';
+import {simulate as simulateBaseline} from '../docs/brief-analysis/dist/model.mjs';
 async function readJson(req){
  if(req.headers['content-type']?.split(';')[0].trim()!=='application/json')throw new ApiError(415,'CONTENT_TYPE','Используйте application/json.');
  const chunks=[];let size=0;
@@ -18,8 +19,11 @@ async function readJson(req){
  try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}
  catch{throw new ApiError(400,'INVALID_JSON','Некорректный JSON.');}
 }
-const staticFiles={'/':['index.html','text/html'],'/workbench.js':['workbench.js','text/javascript'],'/workbench.css':['workbench.css','text/css']};
 const postPaths=['/api/simulate','/api/analyze','/api/compare','/api/search','/api/facts','/api/evidence','/api/assistant'];
+function baseline(){
+ const {districts:districtSnapshots,...snapshot}=simulateBaseline([]);
+ return {...snapshot,districts:districtSnapshots.map(({profile,...district})=>district)};
+}
 function only(input,keys){
  if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!keys.includes(k)))
   throw new ApiError(422,'VALIDATION_ERROR','Неожиданные поля запроса.');
@@ -38,13 +42,15 @@ export function createApp(config={}){
     res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');
    }
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
-   if(req.method==='GET'&&Object.hasOwn(staticFiles,req.url)){
-    const [file,type]=staticFiles[req.url],body=await readFile(new URL('../analytics/public/'+file,import.meta.url));
-    res.writeHead(200,{'Content-Type':type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(body);return;
+   const path=new URL(req.url,'http://localhost').pathname;
+   if(req.method==='GET'&&path==='/'){res.writeHead(302,{Location:'/demos/astana-city/','Cache-Control':'no-store'});res.end();return;}
+   if(req.method==='GET'){
+    const asset=await staticResponse(path);
+    if(asset){res.writeHead(200,{'Content-Type':asset.type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(asset.body);return;}
    }
    if(req.method==='GET'&&req.url==='/api/health')return send(200,{status:'ok',contractVersion:'1',aiMode:config.mode??'openai',aiConfigured:Boolean(config.apiKey&&config.model),modelVersion:MODEL_INFO.version});
    if(req.method==='GET'&&req.url==='/api/contracts')return send(200,{requestSchema,analysisSchema,simulateSchema,model:MODEL_INFO});
-   if(req.method==='GET'&&req.url==='/api/catalog')return send(200,{districts,measures,indicators,groups,model:MODEL_INFO});
+   if(req.method==='GET'&&req.url==='/api/catalog')return send(200,{districts,measures,indicators,groups,baseline:baseline(),model:MODEL_INFO});
    if(!postPaths.includes(req.url))throw new ApiError(404,'NOT_FOUND','Маршрут не найден.');
    if(req.method!=='POST'){res.setHeader('Allow','POST');throw new ApiError(405,'METHOD_NOT_ALLOWED','Используйте POST.');}
    const input=await readJson(req);
@@ -95,7 +101,7 @@ export function createApp(config={}){
  app.requestTimeout=30000;return app;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- const port=Number(process.env.PORT??3001),mode=process.env.AI_MODE??'demo';
+ const port=Number(process.env.PORT??4197),mode=process.env.AI_MODE??'demo';
  if(!['demo','openai'].includes(mode))throw new Error('AI_MODE must be openai or demo');
  if(!Number.isInteger(port)||port<1||port>65535)throw new Error('PORT must be 1..65535');
  const app=createApp({mode,apiKey:process.env.OPENAI_API_KEY,model:process.env.OPENAI_MODEL,
