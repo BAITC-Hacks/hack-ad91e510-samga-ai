@@ -1,0 +1,26 @@
+# Local environment files (examples must contain placeholders only)
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Credentials and private keys
+secrets/
+.secrets/
+credentials.json
+credentials.*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Local tool credentials
+.aws/
+.ssh/
+.codex/
+
+# Logs may contain sensitive runtime data
+*.log
