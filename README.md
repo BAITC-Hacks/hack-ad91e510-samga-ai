@@ -129,3 +129,7 @@ node --check docs/brief-analysis/dist/data.mjs
 
 Перед сдачей сверить список с актуальными требованиями кейса и
 [инструкцией организаторов](https://drive.google.com/file/d/105Rnhzg3Q5tKjfGZIddRqY13kmq_w4r_/view).
+
+## Backend и AI-интеграция
+
+Командный backend из ветки meru/ai включён в эту ветку. Контракт, запуск и ограничения описаны в [backend/README.md](backend/README.md). Живой вызов с ключом команды пока не проверен.
