@@ -1,6 +1,12 @@
 import { Icon } from './Icon.mjs';
 import { GlassCard } from './GlassCard.mjs';
 import { esc } from '../lib/format.mjs';
+function explanationMarkup(text) {
+  return String(text).split(/\n+/).filter(line => line.trim()).map(line => {
+    const safe = esc(line.trim().replace(/^#{1,6}\s+/,''));
+    return `<p>${safe.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')}</p>`;
+  }).join('');
+}
 export function AIInsightCard(state) {
   const analysis = state.analysis;
   if (state.analysisBusy) return GlassCard(`<div class="section-heading"><h2>${Icon('spark')} AI-анализ</h2><span class="spinner"></span></div><p class="ai-intro">Разбираем сильные стороны, риски и компромиссы ваших решений.</p><div class="skeleton" aria-hidden="true"><i></i><i></i><i></i></div><span class="sr-only" role="status">Ожидаем анализ сценария</span>`,'ai-card');
@@ -14,5 +20,5 @@ export function AIInsightCard(state) {
     ['Компромиссы',summary[2]?.text,'decisions'],
     ['Что улучшить',recommendation ? `${recommendation.title}. ${recommendation.description}.` : null,'spark']
   ].filter(([,text]) => text);
-  return GlassCard(`<div class="section-heading"><h2>${Icon('spark')}${isAI ? 'AI-анализ' : 'Разбор сценария'}</h2><span class="small-tag">${isAI ? 'SAMGA AI' : 'По расчётной модели'}</span></div>${isAI ? `<div class="ai-explanation">${esc(analysis.explanation)}</div>` : `<p class="ai-intro">${esc(analysis?.notice ?? 'AI-анализ пока недоступен.')}</p>`}${facts.length ? `<div class="ai-facts">${facts.map(([title,text,icon]) => `<section><span class="ai-fact-icon">${Icon(icon)}</span><div><h3>${title}</h3><p>${esc(text)}</p></div></section>`).join('')}</div>` : `<div class="ai-awaiting"><span>${Icon('spark')}</span><p>Персональный AI-разбор появится после подключения AI-сервиса.</p><div>Сильные стороны <b>·</b> Риски <b>·</b> Компромиссы <b>·</b> Что улучшить</div></div>`}`,'ai-card ai-enter');
+  return GlassCard(`<div class="section-heading"><h2>${Icon('spark')}${isAI ? 'AI-анализ' : 'Разбор сценария'}</h2><span class="small-tag">${isAI ? 'SAMGA AI' : 'По расчётной модели'}</span></div>${isAI ? `<div class="ai-explanation">${explanationMarkup(analysis.explanation)}</div>` : `<p class="ai-intro">${esc(analysis?.notice ?? 'AI-анализ пока недоступен.')}</p>`}${facts.length ? `<div class="ai-facts">${facts.map(([title,text,icon]) => `<section><span class="ai-fact-icon">${Icon(icon)}</span><div><h3>${title}</h3><p>${esc(text)}</p></div></section>`).join('')}</div>` : isAI ? '' : `<div class="ai-awaiting"><span>${Icon('spark')}</span><p>Персональный AI-разбор появится после подключения AI-сервиса.</p><div>Сильные стороны <b>·</b> Риски <b>·</b> Компромиссы <b>·</b> Что улучшить</div></div>`}`,'ai-card ai-enter');
 }

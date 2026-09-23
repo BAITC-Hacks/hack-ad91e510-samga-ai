@@ -86,7 +86,10 @@ document.addEventListener('click', event => {
   if (action === 'retry-boot') boot();
   if (!state.data) return;
   if (action === 'filter') { state.group = group; render(); }
-  if (action === 'district' && state.data.districts.some(d => d.name === district)) { state.district = district; render(); }
+  if (action === 'district' && state.data.districts.some(d => d.name === district)) {
+    state.district = district; render();
+    document.querySelector('#district-detail').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',block:'start'});
+  }
   if (action === 'pick' && !state.busy) {
     const measure = state.data.measures.find(m => m.id === id);
     if (!measure) return;
