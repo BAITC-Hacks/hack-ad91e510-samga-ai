@@ -1,19 +1,19 @@
 @echo off
 cd /d "%~dp0"
-where py >nul 2>nul
-if %errorlevel% equ 0 (
-  py -3 start-demo.py
+where node >nul 2>nul
+if errorlevel 1 (
+  echo Node.js 24 or newer is required: https://nodejs.org/
+  pause
+  exit /b 1
+)
+echo Open http://127.0.0.1:4197/ ^(stop with Ctrl+C^)
+if exist backend\.env (
+  node --env-file=backend\.env backend\server.mjs
 ) else (
-  where python >nul 2>nul
-  if errorlevel 1 (
-    echo Python 3 is required: https://www.python.org/downloads/
-    pause
-    exit /b 1
-  )
-  python start-demo.py
+  node backend\server.mjs
 )
 if errorlevel 1 (
-  echo Start failed. Check that Python 3 is installed and the ZIP is fully extracted.
+  echo Start failed. Check Node.js 24+, port 4197, and the terminal output.
   pause
   exit /b 1
 )

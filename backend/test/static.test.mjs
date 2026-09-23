@@ -1,9 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
-import {readFile} from 'node:fs/promises';
+import {mkdtemp,rm} from 'node:fs/promises';
 import {createApp} from '../server.mjs';
 import {resolveStaticAsset} from '../static.mjs';
+import {spawn} from 'node:child_process';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import net from 'node:net';
 
 async function start(t) {
  const app=createApp({mode:'demo'});app.listen(0,'127.0.0.1');await once(app,'listening');
@@ -66,7 +71,14 @@ test('city resolver only permits named public assets',()=>{
  assert.equal(resolveStaticAsset('/demos/astana-city/planner.mjs')?.type,'text/javascript');
 });
 
-test('CLI defaults to the designated loopback port',async()=>{
- const source=await readFile(new URL('../server.mjs',import.meta.url),'utf8');
- assert.match(source,/process\.env\.PORT\?\?4197/);
+test('CLI serves the API from another cwd on an explicit loopback port',async t=>{
+ const port=await new Promise((resolve,reject)=>{
+  const probe=net.createServer();probe.once('error',reject).listen(0,'127.0.0.1',()=>{const {port}=probe.address();probe.close(()=>resolve(port));});
+ });
+ const cwd=await mkdtemp(join(tmpdir(),'samga cli-'));
+ const child=spawn(process.execPath,[fileURLToPath(new URL('../server.mjs',import.meta.url))],{cwd,env:{...process.env,PORT:String(port),AI_MODE:'demo'}});
+ t.after(async()=>{if(child.exitCode===null){child.kill('SIGTERM');await once(child,'exit');}await rm(cwd,{recursive:true,force:true});});
+ await once(child.stdout,'data');
+ const response=await fetch(`http://127.0.0.1:${port}/api/catalog`);
+ assert.equal(response.status,200);assert.ok(Math.abs((await response.json()).baseline.score-52.55768)<1e-10);
 });
