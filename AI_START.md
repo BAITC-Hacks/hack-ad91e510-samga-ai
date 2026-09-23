@@ -98,6 +98,9 @@ node --check demos/astana-story/app.mjs
 авторизация в опубликованный срез не входят. Объяснения подготовлены заранее.
 Расхождение PDF/DOCX о пяти направлениях остаётся открытым.
 
+Команда планирует подключить OpenAI API позже. Ключ и хакатонный кредит пока не
+используются. План серверной интеграции и границы точности: [API_INTEGRATION.md](docs/API_INTEGRATION.md).
+
 Подробнее: [описание панели](demos/astana-story/README.md),
 [происхождение ресурсов](demos/astana-story/ORIGIN.md),
 [ТЗ](docs/brief-analysis/sources/brief.txt),
