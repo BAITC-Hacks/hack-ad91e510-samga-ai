@@ -7,7 +7,7 @@ export function districtIssues(district, indicators, layer = 'all') {
 }
 export function recommendationsFor(indicatorId, measures) {
   // Catalog matching, not an optimizer: only positive effects on the selected indicator.
-  return measures.filter(m => m.effects[indicatorId] > 0).sort((a,b)=>a.cost-b.cost);
+  return measures.filter(m => m.effects[indicatorId] > 0).sort((a,b)=>b.effects[indicatorId]-a.effects[indicatorId] || a.cost-b.cost);
 }
 export function relevantChoices(state, district, indicatorId) {
   return state.choices.filter(c => {
