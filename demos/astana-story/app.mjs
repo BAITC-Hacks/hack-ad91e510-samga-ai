@@ -1,7 +1,7 @@
 import {baseline,presets,analyse,districts,indicators,measures} from './comparison.mjs';
 import {createComparisonMap} from './map.mjs';
 import {icon} from './shell.mjs';
-import {inspectDraft,proposeChoice,buildDistrictMatrix} from './planner.mjs';
+import {inspectDraft,proposeChoice,buildDistrictMatrix,readLinkedPlan} from './planner.mjs';
 import {createCatalog} from './catalog-ui.mjs';
 
 const $=id=>document.getElementById(id);
@@ -208,6 +208,8 @@ window.akimAssistant={
   if(action.type==='select_preset'&&presets.some(p=>p.id===action.preset)){stop();choosePreset(action.preset);}
  }
 };
-render();
+const linkedPlan=readLinkedPlan(location.search);
+if(linkedPlan.choices)setDraft(linkedPlan.choices,linkedPlan.choices.find(c=>c.district)?.district??'Нура','План из отчёта восстановлен и пересчитан.');
+else {feedback=linkedPlan.error??'';render();}
 createComparisonMap({onSelect:focusDistrict,onStatus:(message,error=false)=>{$('map-status').textContent=message;$('map-status').hidden=!message;$('map-status').classList.toggle('error',error);}}).then(controller=>{cityMap=controller;renderMap();cityMap.setView(hasPlan()?'districts':'city');});
 if(new URLSearchParams(location.search).get('demo')==='1'){playing=true;render();schedule();}

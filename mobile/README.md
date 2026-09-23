@@ -35,6 +35,8 @@ xcodebuild -project AKIM.xcodeproj -scheme AKIM -configuration Debug \
 
 Соберите роль жителя и выполните её независимые unit-тесты:
 
+Начните в новом терминале из корня репозитория, как и для первой роли.
+
 ```sh
 cd mobile/citizen
 xcodegen generate --spec project.yml
@@ -43,6 +45,21 @@ xcodebuild -project AKIMCitizen.xcodeproj -scheme AKIMCitizen -configuration Deb
   -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
 swift test
 ```
+
+После сборки установите приложение на выбранный симулятор. Из папки соответствующей роли замените UUID на значение из `xcrun simctl list devices available`:
+
+```sh
+AKIM_SIM_ID='UUID_ВАШЕГО_СИМУЛЯТОРА'
+xcrun simctl boot "$AKIM_SIM_ID"
+# Для акима, из mobile/akim:
+xcrun simctl install "$AKIM_SIM_ID" build/Build/Products/Debug-iphonesimulator/AKIM.app
+xcrun simctl launch "$AKIM_SIM_ID" kz.hackalem.akim --demo
+# Для жителя, из mobile/citizen, вместо двух предыдущих команд:
+xcrun simctl install "$AKIM_SIM_ID" build/Build/Products/Debug-iphonesimulator/AKIMCitizen.app
+xcrun simctl launch "$AKIM_SIM_ID" kz.hackalem.akim.citizen.demo
+```
+
+Если выбранный симулятор уже Booted, команду `boot` пропустите. Запускайте только команды выбранной роли.
 
 Конкретный Mac, Xcode и симулятор должны быть проверены перед показом. Этот пакет не обещает работу камеры в симуляторе: там используйте галерею или подготовленный пример.
 

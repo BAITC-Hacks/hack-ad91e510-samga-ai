@@ -1,7 +1,8 @@
 import { parseSseStream } from './sse.mjs';
 
 const styleId = 'akim-assistant-style';
-const defaults = { model: 'gpt-4.1-mini', voiceId: 'JBFqnCBsd6RMkjVDRZzb' };
+// Adam — тот же стандартный ElevenLabs-голос, что в web-sardar/useElevenLabsSpeech.ts.
+const defaults = { model: 'gpt-4.1-mini', voiceId: 'pNInz6obpgDQGcFmaJgB' };
 const quickQuestions = ['Сравни варианты', 'Почему Нура?', 'Что улучшить?'];
 const allowedActions = new Set(['focus_comparison', 'focus_district', 'select_preset']);
 
@@ -76,7 +77,7 @@ export function initAssistant({ getContext, onAction, headModuleUrl, apiBase = '
         <label>OpenAI API key<input name="openaiKey" type="password" autocomplete="off" placeholder="sk-…"></label>
         <label>ElevenLabs API key<input name="elevenlabsKey" type="password" autocomplete="off" placeholder="Ключ ElevenLabs"></label>
         <label>Модель<input name="model" type="text" value="gpt-4.1-mini"></label>
-        <label>Voice ID<input name="voiceId" type="text" value="JBFqnCBsd6RMkjVDRZzb"></label>
+        <label>Voice ID<input name="voiceId" type="text" value="${defaults.voiceId}"></label>
         <button class="akim-assistant__connect" type="submit">Подключить</button>
         <span class="akim-assistant__settings-status" role="status"></span>
       </form>

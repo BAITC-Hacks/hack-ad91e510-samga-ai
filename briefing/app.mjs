@@ -48,7 +48,7 @@ function render(s){
  $('tradeoffs').innerHTML=(b.tradeoffs.length?lines(b.tradeoffs,Infinity):'<p>Снижения показателей относительно плана сравнения нет.</p>')+(b.critical.remaining.length?`<p class="negative">Остаются ниже 40:</p>${lines(b.critical.remaining,Infinity)}`:'<p class="positive">Значений ниже 40 не осталось.</p>')+`<p class="muted">${b.coverage.missing.length?'Без мер в направлении: '+esc(b.coverage.missing.join(', '))+'.':'Представлены все пять направлений.'} Ноль критических показателей не означает, что все проблемы решены.</p>`;
  $('measures').innerHTML=`<table><thead><tr><th>Мера</th><th>Где</th><th>Цена</th></tr></thead><tbody>${b.measures.map(m=>`<tr><td>${m.id} · ${esc(m.name)}</td><td>${esc(m.district)}</td><td>${m.cost}</td></tr>`).join('')}</tbody></table>`;
  $('decomposition').innerHTML='<h3 style="margin-top:20px">Из чего складывается изменение индекса</h3>'+b.decomposition.map(d=>`<div class="contribution"><span>${esc(d.name)}</span><b>${signed(d.contribution)}</b></div>`).join('');
- $('open-map').href='/?plan='+encodeURIComponent(JSON.stringify(b.scenario.choices));
+ $('open-map').href='/demos/astana-story/main.html?plan='+encodeURIComponent(JSON.stringify(b.scenario.choices));
 }
 function download(contents,type,name){const url=URL.createObjectURL(new Blob([contents],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('download-html').onclick=()=>{if(session.state.html&&!session.state.busy)download(session.state.html,'text/html;charset=utf-8','samga-decision.html');};

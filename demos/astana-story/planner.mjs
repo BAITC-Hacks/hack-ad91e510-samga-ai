@@ -3,6 +3,17 @@ import {baseline,districts,indicators,measures} from './comparison.mjs';
 
 const catalog=new Map(measures.map(m=>[m.id,m]));
 
+export function readLinkedPlan(search){
+ const raw=new URLSearchParams(search).get('plan');
+ if(raw===null)return {choices:null,error:null};
+ try{
+  const choices=JSON.parse(raw);
+  if(!Array.isArray(choices)||choices.some(c=>!c||typeof c!=='object'||Object.keys(c).some(k=>!['id','district'].includes(k))))return {choices:null,error:'План в ссылке содержит неподдерживаемые данные.'};
+  const errors=validate(choices);
+  return errors.length?{choices:null,error:errors.join(' ')}:{choices:choices.map(c=>({...c})),error:null};
+ }catch{return {choices:null,error:'Не удалось прочитать план из ссылки. Соберите свой план или откройте пример.'};}
+}
+
 export function inspectDraft(choices){
  const errors=validate(choices,{allowIncomplete:true});
  const list=Array.isArray(choices)?choices:[];

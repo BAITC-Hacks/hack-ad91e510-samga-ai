@@ -18,6 +18,20 @@ export async function runJuryCheck(base,{liveAi=false,includeSearch=true}={}){
   catch(error){checks.push({id,requirement,status:'failed',error:error.message});}
  }
  let scenario;
+ await check('web-mobile-entry','Веб и реальные мобильные экраны доступны из одной сборки',async()=>{
+  for(const path of ['/demos/astana-story/','/demos/astana-story/main.html','/demos/astana-story/onboarding.mjs','/briefing/','/mobile/','/mobile/preview/demo-feed.png','/mobile/preview/report-detail.png']){
+   const r=await fetch(new URL(path,base));assert.equal(r.status,200,path);
+  }
+  return {web:'/demos/astana-story/',mobile:'/mobile/',report:'/briefing/'};
+ });
+ await check('five-directions','Пример README охватывает все пять направлений',async()=>{
+  const choices=[{id:'M1',district:'Нура'},{id:'M4',district:'Сарыарка'},{id:'M7',district:'Нура'},{id:'M10',district:'Нура'},{id:'M12'}];
+  const r=await call('/api/simulate',{choices});assert.equal(r.status,200);
+  approx(r.body.result.score,55.60722);assert.equal(r.body.result.cost,83);assert.equal(r.body.result.critical,1);
+  const report=await call('/api/brief',{choices});assert.equal(report.status,200);
+  approx(report.body.brief.scenario.result.score,55.60722);assert.match(report.body.html,/<!doctype html>/i);
+  return {cost:83,reserve:17,score:r.body.result.score,critical:1,reportRecomputed:true};
+ });
  await check('equal-start','Единые исходные данные и бюджет',async()=>{
   const a=await call('/api/simulate',{choices:reference}),b=await call('/api/simulate',{choices:capital});
   assert.equal(a.status,200);assert.equal(b.status,200);assert.deepEqual(a.body.baseline,b.body.baseline);

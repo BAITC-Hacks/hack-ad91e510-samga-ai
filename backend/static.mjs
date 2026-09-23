@@ -37,6 +37,7 @@ const storyAssets=new Map([
  ['/demos/astana-story/assistant/avatar/vendor/examples/jsm/utils/SkeletonUtils.js',['assistant/avatar/vendor/examples/jsm/utils/SkeletonUtils.js','text/javascript']]
 ]);
 const exact=new Map([
+ ['/mobile/README.md',['../mobile/README.md','text/plain']],
  ['/briefing/',['../briefing/index.html','text/html']],
  ['/briefing/app.mjs',['../briefing/app.mjs','text/javascript']],
  ['/briefing/session.mjs',['../briefing/session.mjs','text/javascript']],

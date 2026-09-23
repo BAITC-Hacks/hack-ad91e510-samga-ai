@@ -31,6 +31,8 @@ function mountGuide() {
       <button type="button" class="onboarding-guide__primary" data-onboarding-action="demo">Посмотреть пример</button>
       <button type="button" class="onboarding-guide__secondary" data-onboarding-action="plan">Составить свой план</button>
       <button type="button" class="onboarding-guide__help" data-onboarding-action="help" aria-haspopup="dialog">Как пользоваться</button>
+      <button type="button" class="onboarding-guide__help" data-onboarding-action="report">Подбор и отчёт</button>
+      <button type="button" class="onboarding-guide__help" data-onboarding-action="mobile">Мобильная версия</button>
     </div>`;
 
   const dialog = document.createElement('dialog');
@@ -68,6 +70,14 @@ function mountGuide() {
   guide.addEventListener('click', event => {
     const action = event.target.closest('[data-onboarding-action]')?.dataset.onboardingAction;
     if (!action) return;
+    if(action==='report'||action==='mobile'){
+      const base=['8095','4196'].includes(location.port)?`${location.protocol}//${location.hostname}:4197`:location.origin;
+      const url=new URL(action==='report'?'/briefing/':'/mobile/',base);
+      const choices=window.akimAssistant?.getContext?.().choices;
+      if(action==='report'&&Array.isArray(choices)&&choices.length===5)url.searchParams.set('plan',JSON.stringify(choices));
+      location.href=url.href;
+      return;
+    }
     if (action === 'help') {
       dialog.showModal();
       dialog.querySelector('.onboarding-dialog__close').focus();
