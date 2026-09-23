@@ -16,7 +16,7 @@
     <button id="insights" class="header-button">Анализ</button><button id="strategy" class="header-button">Найти план</button><button id="compare" class="header-button">Сравнить</button><button id="overview" class="header-button">Обзор города <span>↗</span></button>
   </header>
   <main>
-    <section class="intro"><div class="eyebrow">ГОРОД, КОТОРЫЙ МЕНЯЕТЕ ВЫ</div><h1>Будущее Астаны.<br><span>В ваших решениях.</span></h1><p>Пять решений. Один город. Видимый результат.</p></section>
+    <section class="intro"><div class="eyebrow">АКИМ НА 5 ЧАСОВ · ШАГ 1 ИЗ 2</div><h1>На что потратим<br><span>100 единиц?</span></h1><p>Выберите пять решений и посмотрите последствия для города через два года.</p></section>
     <nav class="layer-bar" aria-label="Слои карты">
       <button class="layer active" data-layer="city" aria-pressed="true"><span>▥</span>Город</button>
       <button class="layer" data-layer="districts" aria-pressed="false"><span>◈</span>Районы</button>
@@ -37,10 +37,10 @@
     <div class="view-tools"><button id="tilt" aria-pressed="true" title="Переключить плоскую и объёмную карту">3D</button><button id="home" aria-label="Вернуться к Байтереку" title="К центру города">⌖</button><button id="zoom-in" aria-label="Приблизить">+</button><button id="zoom-out" aria-label="Отдалить">−</button></div>
     <div class="map-status" id="map-status" role="status">Загружаем городскую геометрию…</div>
     <section class="scenario">
-      <div class="scenario-lead"><span class="eyebrow">ВАШ ПЛАН</span><h2>Пять решений</h2><p>Нажмите проект, чтобы изменить</p></div>
+      <div class="scenario-lead"><span class="eyebrow">ШАГ 1 · ВЫБЕРИТЕ РЕШЕНИЯ</span><h2>Ваш план · 5 из 5</h2><p>Нажмите проект, чтобы изменить</p><button id="load-source" class="example-button">Пример из задания ↗</button></div>
       <div class="decisions" id="decisions"></div>
-      <div class="budget"><span>БЮДЖЕТ ПЛАНА</span><strong id="budget">85 <small>/ 100</small></strong><div class="budget-track"><i></i></div><span id="budget-rest"></span></div>
-      <button id="apply" class="apply">Показать результат <span>↗</span></button>
+      <div class="budget"><span>ОСТАЛОСЬ ИЗ 100 ЕД.</span><strong id="budget-left">15</strong><span class="budget-spent">Потрачено <b id="budget">85</b> ед.</span><div class="budget-track"><i></i></div><span id="budget-rest"></span></div>
+      <button id="apply" class="apply">Посмотреть будущее <span>↗</span></button>
     </section>
   </main>
   <footer><span>География OpenStreetMap · высоты могут быть оценочными</span><span>Вращение: правая кнопка мыши · масштаб: колесо</span></footer>

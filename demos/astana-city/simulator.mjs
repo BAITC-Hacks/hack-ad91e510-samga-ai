@@ -1,4 +1,4 @@
-import {measures,districts,groups,indicators} from '../../docs/brief-analysis/dist/data.mjs';
+import {measures,districts,groups,indicators,scenarios} from '../../docs/brief-analysis/dist/data.mjs';
 import {evaluate,validate} from '../../docs/brief-analysis/dist/model.mjs';
 const $=id=>document.getElementById(id);
 const fmt=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2});
@@ -6,6 +6,7 @@ const sign=n=>(n>0?'+':'')+fmt(n);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const titles={M1:'Автобусные полосы',M2:'Умные светофоры',M3:'Линия ЛРТ',M4:'Парк и сквер',M5:'Чистое топливо',M6:'Озеленение города',M7:'Школа и детсад',M8:'Поликлиника',M9:'Спортивные дворы',M10:'Свет и камеры',M11:'Безопасные переходы',M12:'Обращения жителей',M13:'Тепло и водоснабжение',M14:'Бригады ЖКХ'};
 const humanError=text=>text.replace(/\bM\d+\b/g,id=>titles[id]??id);
+const shortGroups={T:'Транспорт',E:'Экология',S:'Соцсфера',B:'Безопасность',C:'Сервисы'};
 const icons={T:'↗',E:'♧',S:'▤',B:'◉',C:'⌘'};
 async function api(path,body){
  const response=await fetch('/api/'+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});
@@ -28,11 +29,12 @@ export function mountSimulator({getState,updatePlan,showImpact}){
   $('decisions').replaceChildren(...choices.map((c,index)=>{
    const m=measures.find(m=>m.id===c.id),button=document.createElement('button');
    button.className='decision';button.setAttribute('aria-label','Изменить проект '+(index+1)+': '+titles[c.id]);
-   button.innerHTML='<span class="decision-top"><span class="decision-icon">'+icons[m.group]+'</span><span class="edit-mark">↗</span></span><span class="decision-name">'+titles[c.id]+'</span><span class="decision-district">'+(c.district??'Весь город')+'</span><span class="decision-price">'+m.cost+' ед.</span>';
+   button.innerHTML='<span class="decision-top"><span class="decision-icon">'+icons[m.group]+'</span><span class="decision-group">'+shortGroups[m.group]+'</span><span class="edit-mark">↗</span></span><span class="decision-name">'+titles[c.id]+'</span><span class="decision-district">'+(c.district??'Весь город')+'</span><span class="decision-price">'+m.cost+' ед.</span>';
    button.onclick=()=>edit(index);return button;
   }));
-  $('budget').innerHTML=result.cost+' <small>/ 100</small>';
-  $('budget-rest').textContent=(100-result.cost)+' ед. в резерве';
+  $('budget').textContent=result.cost;
+  $('budget-left').textContent=100-result.cost;
+  $('budget-rest').textContent='Из 100 ед. · 5 решений';
   document.querySelector('.budget-track i').style.width=result.cost+'%';
  }
  async function accept(next,button){
@@ -46,6 +48,19 @@ export function mountSimulator({getState,updatePlan,showImpact}){
   }catch(error){if(token===view){const el=$('action-error');if(el)el.textContent=humanError(error.message);else notify(error.message);}}
   finally{busy=false;button.disabled=false;}
  }
+ function sourceExample(){
+  const source=scenarios.find(s=>s.id==='source').choices;
+  const sample=evaluate(source),{result}=getState();
+  open('Пример из задания · 95 из 100');
+  body.innerHTML='<p class="dialog-intro">Пять мер из примера организаторов: школа, поликлиника и безопасность в Нуре; чистое топливо в Сарыарке; цифровые обращения для всего города. Останется 5 единиц.</p>'+
+   '<div class="comparison-grid"><section><span class="eyebrow">ВАШ ПЛАН</span><h3>'+fmt(result.score)+' балла</h3><ul class="plan-description">'+planDescription(getState().choices)+'</ul></section>'+
+   '<section><span class="eyebrow">ПРИМЕР ИЗ ЗАДАНИЯ</span><h3>'+fmt(sample.score)+' балла</h3><ul class="plan-description">'+planDescription(source)+'</ul></section></div>'+
+   '<div class="metric-table">'+summaryRows(result,sample)+'</div>'+
+   '<p class="dialog-intro">Это иллюстрация расчёта, а не доказанный лучший план. Расхождение PDF и DOCX о направлениях ещё требует уточнения.</p>'+
+   '<button id="use-source" class="primary">Взять пример и посмотреть город</button><p id="action-error" class="error-text" role="alert"></p>';
+  $('use-source').onclick=e=>accept(source,e.currentTarget);
+ }
+ $('load-source').onclick=sourceExample;
  function edit(index){
   const {choices,result}=getState();let draft=structuredClone(choices),group='all';
   open('Изменить решение '+(index+1)+' из 5');

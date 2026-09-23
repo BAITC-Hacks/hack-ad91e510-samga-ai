@@ -36,12 +36,15 @@ function render(){
   $('district-change').textContent=d&&mode==='after'?`${signed(d.score-b.score)} к индексу`:'Выбранный район';
   $('district-profile').textContent=baseline.districts.find(x=>x.name===selected)?.profile??'Для этого района нет показателей в учебном датасете.';
   $('metrics').innerHTML=d?metricKeys.map(([key,label])=>`<div class="metric"><span>${label}</span><span class="metric-bar"><i style="width:${d.values[key]}%"></i></span><b>${Math.round(d.values[key])}</b></div>`).join(''):'';
-  $('apply').innerHTML=mode==='before'?'Показать результат <span>↗</span>':'Вернуться к исходному <span>↶</span>';
+  $('apply').innerHTML=mode==='before'?'Посмотреть будущее <span>↗</span>':'Вернуться к настоящему <span>↶</span>';
   if(mapReady) updateDistricts();
+  document.querySelector('.intro .eyebrow').textContent=mode==='before'?'АКИМ НА 5 ЧАСОВ · ШАГ 1 ИЗ 2':'АКИМ НА 5 ЧАСОВ · ШАГ 2 ИЗ 2';
+  document.querySelector('.intro h1').innerHTML=mode==='before'?'На что потратим<br><span>100 единиц?</span>':'Что изменилось<br><span>через два года?</span>';
+  document.querySelector('.intro p').textContent=mode==='before'?'Выберите пять решений и посмотрите последствия для города через два года.':'Сравните районы на карте, откройте показатели и проверьте другую гипотезу.';
   $('after').title='Расчёт по модели организаторов: 8 кварталов. Для 1, 5 и 10 лет нет калиброванных данных.';
 }
 function setMode(value){mode=value;render();}
-$('before').onclick=()=>setMode('before');$('after').onclick=()=>setMode('after');$('apply').onclick=()=>setMode(mode==='before'?'after':'before');
+$('before').onclick=()=>setMode('before');$('after').onclick=()=>setMode('after');$('apply').onclick=()=>{if(mode==='before'){setMode('after');setLayer('districts');}else{setMode('before');setLayer('city');}};
 const simulator=mountSimulator({
  getState:()=>({choices:structuredClone(choices),result,baseline,selected,mode}),
  updatePlan:next=>{choices=structuredClone(next);result=evaluate(choices);mode="after";render();},

@@ -8,3 +8,19 @@ dialog{width:min(940px,calc(100vw - 40px));max-height:calc(100dvh - 64px);paddin
 @media(min-width:851px){.panel{max-height:calc(100dvh - 355px)}}@media(min-width:851px) and (min-height:900px){.panel{max-height:calc(100dvh - 385px)}}.map-legend{bottom:225px}.map-caption{bottom:270px}
 
 @media(max-width:600px){.layer-bar{flex-direction:row;gap:4px;padding:4px;top:270px}.layer{width:36px}.layer>span{font-size:18px}}
+
+/* Keep the budget decision in sight; the progress track shows money already allocated. */
+.intro p{max-width:310px;line-height:1.6}.scenario-lead{min-width:155px}.scenario-lead p{max-width:150px}.example-button{display:block;margin-top:9px;padding:0;background:transparent;color:var(--accent);font-size:10px;text-align:left}.example-button:hover{text-decoration:underline}.decision-top{align-items:center;gap:4px}.decision-group{font-size:9px;color:#a5bac2;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.decision-icon{margin-bottom:0;font-size:17px;line-height:1}.decision-name{margin-top:8px;font-weight:600}.budget{min-width:108px}.budget>strong{font-size:38px;line-height:1.1;margin:5px 0 4px;color:var(--accent)}.budget-spent{font-size:10px;letter-spacing:0!important;color:#aec1c9!important}.budget-spent b{font-weight:500;color:#e8eeef}.budget-track{margin-top:10px}#budget-rest{color:#849ca7!important}.apply{font-weight:600;font-size:12px}
+@media(max-width:1150px){.decision-group{font-size:8px}.decision-name{font-size:10px}}
+@media(max-width:850px){.budget{min-width:0}.budget>strong{font-size:28px;margin:0}.budget-spent{white-space:nowrap}.decision-group{margin-top:3px}.scenario-lead{display:none}}
+@media(max-width:600px){.budget>span:first-child{display:block;font-size:8px;line-height:1.15}.budget{display:grid;grid-template-columns:auto auto;column-gap:6px;row-gap:1px;align-items:center}.budget>span:first-child{grid-column:1/-1}.budget>strong{grid-row:2}.budget-spent{grid-row:2;font-size:9px;white-space:normal}.scenario{grid-template-columns:130px 1fr}.apply{font-size:11px}}
+
+@media(max-width:850px){
+ .scenario-lead{display:flex;grid-column:1/-1;min-width:0;align-items:center;justify-content:space-between;gap:8px}
+ .scenario-lead .eyebrow,.scenario-lead h2,.scenario-lead p{display:none}
+ .scenario-lead::before{content:"ПЯТЬ РЕШЕНИЙ";font-size:9px;letter-spacing:1px;color:var(--accent);white-space:nowrap}
+ .example-button{margin:0;font-size:10px}
+ .panel{bottom:280px;max-height:calc(100dvh - 500px)}
+ .view-tools{bottom:285px}
+ .maplibregl-ctrl-bottom-right{bottom:275px}
+}
