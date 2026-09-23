@@ -1,0 +1,5 @@
+import { spentBudget } from '../lib/scenario.mjs';
+export const BudgetHeader = state => {
+  const spent = spentBudget(state.choices, state.data.measures);
+  return `<section class="budget-header glass-card" aria-label="Бюджет сценария"><div class="budget-header-values"><div><span>Бюджет</span><strong>100<small> ед.</small></strong></div><div><span>Использовано</span><strong>${spent}</strong></div><div class="budget-remaining"><span>Осталось</span><strong>${100-spent}</strong></div><div class="budget-decisions"><span>Решений</span><strong>${state.choices.length}<small> / 5</small></strong></div></div><div class="budget-progress" role="progressbar" aria-label="Использованный бюджет" aria-valuenow="${spent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${spent}%"></span></div></section>`;
+};
