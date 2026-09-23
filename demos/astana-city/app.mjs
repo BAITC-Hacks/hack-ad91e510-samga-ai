@@ -1,24 +1,22 @@
-import { scenarios, measures } from '../../docs/brief-analysis/dist/data.mjs';
-import { simulate, evaluate } from '../../docs/brief-analysis/dist/model.mjs';
+import { districts } from '../../docs/brief-analysis/dist/data.mjs';
+import { simulate } from '../../docs/brief-analysis/dist/model.mjs';
+import {initPlanner} from './planner.mjs';
 
 const $ = id => document.getElementById(id);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const baseline = simulate([]);
-const choices = scenarios.find(s => s.id === 'coverage').choices;
-const result = evaluate(choices);
-if (result.errors.length) throw new Error(result.errors.join('; '));
+let baseline = simulate([]), result = null;
 const codes = {Есиль:'KZ711210',Алматы:'KZ711110',Сарыарка:'KZ711310',Байконур:'KZ711410',Нура:'KZ711510',Сарайшық:'KZ711610'};
 const viewpoints = {Есиль:[71.433,51.126],Алматы:[71.479,51.157],Сарыарка:[71.408,51.182],Байконур:[71.447,51.192],Нура:[71.395,51.125],Сарайшық:[71.511,51.117]};
 const metricKeys = [['T2','Транспорт'],['E1','Озеленение'],['S1','Образование']];
 let mode = 'before', selected = 'Есиль', activeLayer = 'city', mapReady = false;
 let map, districtGeo;
 const number = n => n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1});
-const current = () => mode === 'before' ? baseline : result;
+const current = () => mode === 'before' || !result ? baseline : result;
 
 function render(){
   const data = current();
   $('city-score').textContent = number(data.score);
-  $('score-delta').textContent = mode === 'before' ? 'Исходное состояние' : `+${number(result.score - baseline.score)} к индексу`;
+  $('score-delta').textContent = mode === 'before' || !result ? 'Исходное состояние' : `${result.score>=baseline.score?'+':''}${number(result.score - baseline.score)} к индексу`;
   $('score-track').style.width = `${data.score}%`;
   for (const id of ['before','after']) {$(id).classList.toggle('active',mode===id);$(id).setAttribute('aria-pressed',String(mode===id));}
   $('districts').replaceChildren(...[...data.districts,{name:'Сарайшық',score:null}].map(d=>{
@@ -30,20 +28,20 @@ function render(){
   const d=data.districts.find(d=>d.name===selected), b=baseline.districts.find(d=>d.name===selected);
   $('district-name').textContent=selected;
   $('district-change').textContent=d&&mode==='after'?`+${number(d.score-b.score)} к индексу`:'Выбранный район';
-  $('district-profile').textContent=d?.profile??'Для этого района нет показателей в учебном датасете.';
+  $('district-profile').textContent=districts.find(x=>x.name===selected)?.profile??'Для этого района нет показателей в учебном датасете.';
   $('metrics').innerHTML=d?metricKeys.map(([key,label])=>`<div class="metric"><span>${label}</span><span class="metric-bar"><i style="width:${d.values[key]}%"></i></span><b>${Math.round(d.values[key])}</b></div>`).join(''):'';
-  $('apply').innerHTML=mode==='before'?'Показать результат <span>↗</span>':'Вернуться к исходному <span>↶</span>';
+  $('after').disabled=!result;
   if(mapReady) updateDistricts();
 }
-const icons=['↗','♧','▤','◉','⌘'];
-const titles=['Автобусные полосы','Новый парк','Школа и детсад','Свет и камеры','Бригады ЖКХ'];
-$('decisions').innerHTML=choices.map((c,i)=>{const m=measures.find(m=>m.id===c.id);return `<div class="decision"><span class="decision-icon">${icons[i]}</span><span class="decision-name">${titles[i]}</span><span class="decision-district">${c.district??'Весь город'} <span class="decision-price">· ${m.cost}</span></span></div>`;}).join('');
-$('budget').innerHTML=`${result.cost} <small>/ 100</small>`;
-$('budget-rest').textContent=`${100-result.cost} ед. в резерве`;
-document.querySelector('.budget-track i').style.width=`${result.cost}%`;
-function setMode(value){mode=value;render();}
-$('before').onclick=()=>setMode('before');$('after').onclick=()=>setMode('after');$('apply').onclick=()=>setMode(mode==='before'?'after':'before');
+function setMode(value){mode=value==='after'&&result?'after':'before';render();}
+$('before').onclick=()=>setMode('before');$('after').onclick=()=>setMode('after');
 render();
+initPlanner({onState:state=>{
+  if(state.catalog)baseline=state.catalog.baseline;
+  const next=state.simulation?.result??null;
+  if(next!==result){result=next;mode=result?'after':'before';}
+  render();
+},onMap:()=>setMode('after')});
 
 function fly(options){map?.flyTo({...options,duration:reducedMotion?0:1400});}
 function selectDistrict(name){selected=name;render();if(mapReady)fly({center:viewpoints[name],zoom:14.35,pitch:55,bearing:-24});}
