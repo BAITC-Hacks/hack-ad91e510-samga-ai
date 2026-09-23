@@ -1,0 +1,161 @@
+/* Только вход АКИМ: общая заготовка главного экрана остаётся независимой. */
+.akim-login {
+  --accent: #08617c;
+  --accent-dark: #0c4964;
+  --accent-soft: rgba(8,97,124,.09);
+  --accent-glow: rgba(8,97,124,.2);
+  --accent-ink: #fff;
+  --text: #173044;
+  --secondary: #40596a;
+  --muted: #526677;
+  --field: #fff;
+  --hairline: rgba(35,63,82,.18);
+  --canvas: #edf1f3;
+  --photo: url('./assets/akim-civic-hall.png');
+  --veil: linear-gradient(180deg,rgba(242,246,248,.94),rgba(234,241,245,.32) 24%,rgba(234,241,245,.3) 76%,rgba(242,246,248,.94));
+  --gold: #d8b556;
+  --font: -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+}
+.akim-login .page-background__image { background-position: center 54%; }
+.akim-login .auth { padding: 28px 42px 22px; }
+.akim-login .auth__top { justify-content: space-between; min-height: 45px; }
+.akim-government { display: grid; gap: 2px; }
+.akim-government strong { font-size: 14px; font-weight: 650; color: var(--text); }
+.akim-government>span { font-size: 12px; color: var(--muted); }
+.akim-top-tools { display: flex; align-items: center; gap: 22px; }
+.akim-language { color: var(--text); font-size: 12px; font-weight: 650; border-left: 1px solid var(--hairline); padding-left: 22px; }
+.akim-login .auth__stage { padding: 35px 0; }
+.akim-login .auth__card {
+  width: min(1060px,100%);
+  grid-template-columns: 42% 58%;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.85);
+  background: rgba(250,252,253,.95);
+  box-shadow: 0 30px 85px -30px rgba(16,42,58,.4),0 2px 8px rgba(16,42,58,.06);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+.akim-login .auth__brand {
+  padding: 30px 34px 32px;
+  justify-content: space-between;
+  min-height: 554px;
+  background: linear-gradient(155deg,#086581 0%,#07506e 48%,#0a354e 100%);
+  isolation: isolate;
+}
+.akim-login .auth__brand::after {
+  inset: 14px;
+  border: 1px solid rgba(216,181,86,.3);
+  border-radius: 7px;
+  background: none;
+  z-index: -1;
+}
+.akim-brand-context { color: #d2e6ed; font-size: 12px; }
+.akim-brand-center { padding: 18px 0; display: flex; flex-direction: column; align-items: center; }
+.akim-mark { display: block; width: 176px; height: 176px; object-fit: contain; }
+.akim-login .auth__brand h1 {
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 8px;
+  padding-left: 8px;
+  margin: 24px 0 14px;
+  color: #fff;
+}
+.akim-login .brand-description { max-width: 290px; font-size: 16px; line-height: 1.65; letter-spacing: 0; color: #dcebf1; text-wrap: balance; }
+.akim-brand-foot { display: grid; justify-items: center; gap: 15px; }
+.akim-rule { display: block; width: 38px; height: 1px; background: var(--gold); }
+.akim-brand-foot p { color: #cde0e9; font-size: 12px; }
+.akim-login .auth__panel { padding: 42px 48px 32px; gap: 22px; }
+.akim-form-heading { margin-bottom: 4px; }
+.akim-login .auth__panel h2 { font-size: 30px; line-height: 1.25; letter-spacing: -.7px; font-weight: 650; }
+.akim-login .hint { margin-top: 9px; font-size: 14px; }
+.akim-login .field { font-size: 12px; color: var(--secondary); font-weight: 600; }
+.akim-login .input-wrap input { border-radius: 8px; min-height: 52px; }
+.akim-login .input-wrap input::placeholder { color: #6b7c89; opacity: 1; }
+.akim-login .button { border-radius: 8px; min-height: 48px; font-weight: 600; }
+.akim-login .button--primary { background: var(--accent-dark); }
+.akim-login .button--primary:hover { background: #075c78; }
+.akim-login .button--primary i { width: 17px; height: 17px; }
+.akim-login .button--secondary { background: rgba(255,255,255,.38); }
+.akim-login .button--secondary:hover { background: var(--accent-soft); }
+.akim-login .divider { font-size: 11px; gap: 12px; }
+.akim-login .demo-note { font-size: 11px; line-height: 1.6; }
+.akim-login .peek { width: 44px; height: 44px; right: 3px; }
+.akim-login .auth__foot { min-height: 40px; text-align: left; color: var(--secondary); }
+.akim-footer-name { display: flex; align-items: center; gap: 14px; }
+.akim-footer-name>[data-brand] { color: var(--text); font-weight: 650; letter-spacing: 1.5px; }
+.akim-footer-name>span+span { padding-left: 14px; border-left: 1px solid var(--hairline); }
+.akim-footer-tools { display: flex; align-items: center; gap: 22px; }
+.akim-login .icon-button { width: 44px; height: 44px; border: 1px solid var(--hairline); background: rgba(255,255,255,.58); color: var(--secondary); }
+.akim-login :focus-visible { outline-color: var(--accent); }
+:root[data-theme='dark'] .akim-login {
+  --accent: #a6d3ed;
+  --accent-dark: #c3def0;
+  --accent-ink: #102b40;
+  --accent-soft: rgba(166,211,237,.1);
+  --text: #eff5f9;
+  --secondary: #d0dce5;
+  --muted: #b4c7d5;
+  --field: #1b3346;
+  --hairline: rgba(194,216,231,.23);
+  --canvas: #102332;
+  --veil: rgba(9,25,39,.82);
+}
+:root[data-theme='dark'] .akim-login .auth__card { background: rgba(16,37,53,.97); border-color: rgba(177,206,225,.2); box-shadow: 0 30px 85px -30px rgba(0,0,0,.6); }
+:root[data-theme='dark'] .akim-login .auth__brand { background: linear-gradient(155deg,#075671,#073b56 55%,#102f46); }
+:root[data-theme='dark'] .akim-login .input-wrap input::placeholder { color: #a4b9c8; }
+:root[data-theme='dark'] .akim-login .button--primary:hover { background: #e0eff9; }
+:root[data-theme='dark'] .akim-login .button--secondary { background: transparent; }
+:root[data-theme='dark'] .akim-login .button--secondary:hover { background: var(--accent-soft); }
+:root[data-theme='dark'] .akim-login .icon-button { background: #193246; }
+@media(min-width:1600px) {
+  .akim-login .auth__card { width: 1100px; }
+  .akim-login .auth__brand { min-height: 582px; }
+  .akim-login .auth__panel { padding: 46px 54px 38px; gap: 24px; }
+}
+@media(min-width:701px) and (max-height:800px) {
+  .akim-login .auth { padding: 20px 32px 16px; }
+  .akim-login .auth__stage { padding: 22px 0; }
+  .akim-login .auth__panel { padding: 30px 40px; gap: 18px; }
+  .akim-login .auth__brand { min-height: 510px; }
+  .akim-form-heading { margin-bottom: 0; }
+}
+@media(max-width:900px) and (min-width:701px) {
+  .akim-login .auth { padding: 24px; }
+  .akim-login .auth__card { grid-template-columns: 39% 61%; }
+  .akim-login .auth__brand { padding: 28px 25px; }
+  .akim-login .auth__brand h1 { font-size: 49px; letter-spacing: 5px; padding-left: 5px; }
+  .akim-login .brand-description { font-size: 15px; }
+  .akim-login .auth__panel { padding: 34px 28px; }
+}
+@media(max-width:700px) {
+  .akim-login .auth { padding: 18px 16px 14px; }
+  .akim-login .auth__top { min-height: 38px; }
+  .akim-government strong { font-size: 12px; }
+  .akim-government>span { font-size: 10px; }
+  .akim-top-tools time { display: none; }
+  .akim-language { padding: 0; border: 0; }
+  .akim-login .auth__stage { padding: 22px 0; }
+  .akim-login .auth__card { grid-template-columns: 1fr; width: min(470px,100%); border-radius: 14px; }
+  .akim-login .auth__brand { padding: 23px 25px; min-height: 0; }
+  .akim-login .auth__brand::after { inset: 9px; border-radius: 5px; }
+  .akim-brand-context,.akim-brand-foot { display: none; }
+  .akim-brand-center { display: grid; grid-template-columns: 96px 1fr; column-gap: 20px; text-align: left; padding: 0; width: 100%; max-width: 320px; }
+  .akim-mark { width: 96px; height: 96px; grid-row: 1 / 3; }
+  .akim-login .auth__brand h1 { font-size: 32px; letter-spacing: 5px; padding: 0; margin: 0 0 6px; }
+  .akim-login .brand-description { font-size: 12px; line-height: 1.5; text-wrap: initial; }
+  .akim-login .auth__panel { padding: 28px 24px 25px; gap: 20px; }
+  .akim-login .auth__panel h2 { font-size: 26px; }
+  .akim-login .hint { font-size: 13px; margin-top: 7px; }
+  .akim-login .input-wrap input { font-size: 16px; }
+  .akim-login .auth__foot { font-size: 10px; gap: 12px; }
+  .akim-footer-name { display: grid; gap: 2px; }
+  .akim-footer-name>span+span { padding: 0; border: 0; }
+  .akim-footer-tools { gap: 12px; }
+}
+@media(max-width:360px) {
+  .akim-login .auth { padding-inline: 12px; }
+  .akim-login .auth__panel { padding-inline: 18px; }
+  .akim-brand-center { column-gap: 14px; grid-template-columns: 82px 1fr; }
+  .akim-mark { width: 82px; height: 82px; }
+}

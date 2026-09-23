@@ -2,13 +2,23 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const codes = {Есиль:'KZ711210',Алматы:'KZ711110',Сарыарка:'KZ711310',Байконур:'KZ711410',Нура:'KZ711510'};
 // Точки служат для обзора районов, а не обозначают участки строительства.
 const centers = {Есиль:[71.448,51.124],Алматы:[71.485,51.161],Сарыарка:[71.406,51.181],Байконур:[71.448,51.196],Нура:[71.392,51.125]};
-const overview = {center:[71.438,51.159],zoom:12.35,pitch:35,bearing:-8};
+const cityView = {center:[71.433,51.1305],zoom:14.7,pitch:58,bearing:-28};
 
 export async function createComparisonMap({onSelect,onStatus}) {
-  let map,ready=false,view=null;
+  let map,ready=false,view=null,mode='city';
   const markers = new Map();
+  const landmarks=[];
   function fitOverview(duration=900){
-    map.fitBounds([[71.383,51.115],[71.495,51.203]],{padding:{top:65,right:55,bottom:85,left:55},pitch:25,bearing:-8,duration:reducedMotion?0:duration,maxZoom:13});
+    map.fitBounds([[71.383,51.115],[71.495,51.203]],{padding:{top:28,right:35,bottom:48,left:35},pitch:20,bearing:-8,duration:reducedMotion?0:duration,maxZoom:13});
+  }
+  function setView(next){
+    mode=next;
+    document.getElementById('city-view').setAttribute('aria-pressed',String(mode==='city'));
+    document.getElementById('district-view').setAttribute('aria-pressed',String(mode==='districts'));
+    if(!ready)return;
+    if(view)present(view);
+    if(mode==='districts')fitOverview();
+    else map.flyTo({...cityView,duration:reducedMotion?0:1000});
   }
   function present(next) {
     view=next;
@@ -19,6 +29,7 @@ export async function createComparisonMap({onSelect,onStatus}) {
       const critical=district.critical.length;
       color.push(codes[district.name],critical?'#ce846e':count?'#b9d68c':'#79969b');
       const marker=markers.get(district.name).getElement();
+      marker.hidden=mode!=='districts';
       marker.classList.toggle('critical',critical>0);
       marker.classList.toggle('invested',count>0);
       marker.classList.toggle('selected',district.name===view.selected);
@@ -31,16 +42,19 @@ export async function createComparisonMap({onSelect,onStatus}) {
     }
     color.push('#719095');
     map.setPaintProperty('district-fill','fill-color',color);
-    map.setPaintProperty('district-fill','fill-opacity',view.before?.12:.18);
+    map.setPaintProperty('district-fill','fill-opacity',mode==='districts'?(view.before?.12:.18):0);
+    map.setPaintProperty('district-outline','line-opacity',mode==='districts'?.35:0);
+    map.setPaintProperty('district-selected','line-opacity',mode==='districts'?.8:0);
+    landmarks.forEach(marker=>{marker.getElement().hidden=mode!=='city';});
     map.setFilter('district-selected',['==',['get','ADM2_PCODE'],codes[view.selected]]);
-    const arrows=view.scenarioId==='source'&&!view.before&&!view.custom
+    const arrows=mode==='districts'&&view.scenarioId==='source'&&!view.before&&!view.custom
       ? ['Нура','Сарыарка'].map(name=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:[centers.Есиль,centers[name]]}}))
       : [];
     map.getSource('reallocation').setData({type:'FeatureCollection',features:arrows});
   }
   try {
     if(!window.maplibregl)throw new Error('Библиотека карты недоступна.');
-    const responses=await Promise.all([fetch('../astana-city/base-style.json'),fetch('../astana-city/astana.geojson')]);
+    const responses=await Promise.all([fetch(new URL('../astana-city/base-style.json',import.meta.url)),fetch(new URL('../astana-city/astana.geojson',import.meta.url))]);
     if(responses.some(r=>!r.ok))throw new Error('Не удалось загрузить основу карты.');
     const [style,geo]=await Promise.all(responses.map(r=>r.json()));
     const colors={background:['background-color','#132a35'],water:['fill-color','#174351'],landuse_residential:['fill-color','#203b46'],landuse_park:['fill-color','#314b40'],landcover_wood:['fill-color','#2b4339'],building:['fill-color','#47616b'],highway_minor:['line-color','#3b5660'],highway_major_inner:['line-color','#617981']};
@@ -55,7 +69,7 @@ export async function createComparisonMap({onSelect,onStatus}) {
         }
       }
     }
-    map=new maplibregl.Map({container:'map',style,...overview,maxPitch:65,minZoom:10,maxZoom:17,canvasContextAttributes:{antialias:true},attributionControl:false});
+    map=new maplibregl.Map({container:'map',style,...cityView,maxPitch:65,minZoom:9,maxZoom:17,canvasContextAttributes:{antialias:true},attributionControl:false});
     map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
     map.on('error',event=>{console.warn('Map resource:',event.error?.message);onStatus('Карта загружается не полностью. Сравнение планов доступно.',true);});
     map.on('load',()=>{
@@ -76,17 +90,25 @@ export async function createComparisonMap({onSelect,onStatus}) {
         element.onclick=event=>{event.stopPropagation();onSelect(name);};
         markers.set(name,new maplibregl.Marker({element,anchor:'center'}).setLngLat(position).addTo(map));
       }
+      for(const [name,position] of [['Байтерек',[71.4305,51.1283]],['Хан Шатыр',[71.4038,51.1324]],['Акорда',[71.446,51.1257]]]){
+        const element=document.createElement('div');element.className='city-landmark';
+        element.innerHTML='<strong>'+name+'</strong><i></i><b></b>';
+        landmarks.push(new maplibregl.Marker({element,anchor:'bottom'}).setLngLat(position).addTo(map));
+      }
       map.on('click','district-fill',event=>{
         const code=event.features?.[0]?.properties.ADM2_PCODE;
         const name=Object.keys(codes).find(name=>codes[name]===code);
         if(name)onSelect(name);
       });
-      ready=true;if(view)present(view);fitOverview(0);
+      ready=true;if(view)present(view);if(mode==='districts')fitOverview(0);
       map.once('idle',()=>onStatus(''));
     });
-    document.getElementById('overview').onclick=()=>fitOverview();
+    document.getElementById('overview').onclick=()=>setView(mode);
+    document.getElementById('city-view').onclick=()=>setView('city');
+    document.getElementById('district-view').onclick=()=>setView('districts');
     document.getElementById('zoom-in').onclick=()=>map.zoomIn({duration:reducedMotion?0:250});
     document.getElementById('zoom-out').onclick=()=>map.zoomOut({duration:reducedMotion?0:250});
   }catch(error){console.error(error);onStatus(error.message+' Район можно выбрать в списке справа.',true);}
-  return {present};
+  window.addEventListener('panel-layout-change',()=>map?.resize());
+  return {present,setView};
 }

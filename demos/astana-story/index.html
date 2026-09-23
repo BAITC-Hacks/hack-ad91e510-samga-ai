@@ -1,57 +1,48 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ASTANA — куда направить бюджет города</title><link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../astana-city/vendor/maplibre-gl.css"><link rel="stylesheet" href="./style.css">
-  <script src="../astana-city/vendor/maplibre-gl.js" defer></script><script type="module" src="./app.mjs"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="АКИМ — демонстрационный прототип интеллектуальной системы управления городом.">
+  <title>АКИМ — вход</title>
+  <link rel="icon" href="./assets/kz-emblem.webp" type="image/webp">
+  <link rel="stylesheet" href="./base.css">
+  <link rel="stylesheet" href="./login.css?v=akim-emblem-2">
+  <script src="./theme.js"></script>
 </head>
-<body>
-  <header class="app-header">
-    <a class="brand" href="../astana-city/" aria-label="Открыть исходный макет"><span class="brand-mark">A<span>•</span></span><span>ASTANA<small>SAMGA AI / CITY LAB</small></span></a>
-    <div class="page-name"><strong>Куда направить бюджет города?</strong><span>«Аким на 5 часов» · демонстрация последствий</span></div>
-    <button id="tour" class="tour-button"><span id="tour-icon">▶</span><span id="tour-label">Смотреть разбор</span></button>
-    <button id="reset" class="reset-button" aria-label="Вернуться к началу" title="Вернуться к началу">↶</button>
-  </header>
-  <main class="workspace">
-    <section class="city-workspace" aria-label="Карта и сравнение планов">
-      <div class="map-toolbar">
-        <div class="map-title"><span class="live-dot"></span><strong id="map-title">Исходный город</strong><span id="map-subtitle">5 районов · бюджет 100</span></div>
-        <div class="view-switch" aria-label="Состояние города"><button id="before" aria-pressed="true">Сейчас</button><button id="after" aria-pressed="false" disabled>Через 2 года</button></div>
+<body class="akim-login">
+  <a class="skip-link" href="#email">Перейти к форме входа</a>
+  <div class="page-background" aria-hidden="true"><div class="page-background__image"></div><div class="page-background__veil"></div></div>
+  <main class="auth">
+    <header class="auth__top">
+      <div class="akim-government"><strong>Республика Казахстан</strong><span>Цифровая платформа акимата</span></div>
+      <div class="akim-top-tools"><time data-clock></time><span class="akim-language" lang="ru" aria-label="Язык страницы: русский">RU</span></div>
+    </header>
+    <div class="auth__stage">
+      <div class="auth__card">
+        <aside class="auth__brand" aria-label="АКИМ — система управления городом">
+          <span class="akim-brand-context">Цифровой акимат</span>
+          <div class="akim-brand-center">
+            <img class="akim-mark" data-brand-logo src="./assets/kz-emblem.webp" width="176" height="176" alt="Государственный герб Республики Казахстан">
+            <h1 data-brand>АКИМ</h1>
+            <p class="brand-description" data-description>Интеллектуальная система управления городом</p>
+          </div>
+          <div class="akim-brand-foot"><span class="akim-rule" aria-hidden="true"></span><p>Город в едином поле зрения</p></div>
+        </aside>
+        <form class="auth__panel" id="login-form">
+          <div class="akim-form-heading"><h2>Вход в систему</h2><p class="hint">Рабочий кабинет руководителя</p></div>
+          <label class="field" for="email"><span>Электронная почта</span><span class="input-wrap"><i data-icon="user" aria-hidden="true"></i><input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="off" required></span></label>
+          <label class="field" for="password"><span>Пароль</span><span class="input-wrap"><i data-icon="lock" aria-hidden="true"></i><input id="password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required><button class="peek" id="password-toggle" type="button" aria-label="Показать пароль" aria-pressed="false"><i data-icon="eye" aria-hidden="true"></i></button></span></label>
+          <p id="login-status" class="form-status" role="status" hidden></p>
+          <button class="button button--primary" type="submit">Войти в кабинет <i data-icon="arrow" aria-hidden="true"></i></button>
+          <div class="divider">Знакомство с системой</div>
+          <a class="button button--secondary" href="./main.html"><i data-icon="layout" aria-hidden="true"></i>Открыть демонстрацию</a>
+          <p class="demo-note">Демонстрационная версия. Авторизация не подключена.</p>
+        </form>
       </div>
-      <div class="map-stage">
-        <div id="map" aria-label="Карта распределения городских проектов"></div>
-        <div class="map-shade"></div>
-        <div id="map-story" class="map-story"><span>Главный вопрос</span><p>Помогут ли ваши решения тем,<br>кому сейчас сложнее всего?</p></div>
-        <div class="map-legend"><span><i class="critical-key"></i> Есть показатели ниже 40</span><span><i class="project-key"></i> Районные проекты</span></div>
-        <div class="map-bottom"><p id="city-program">Выберите район, чтобы увидеть его проблемы.</p><div class="map-controls"><button id="overview">Весь город</button><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button></div></div>
-        <p id="map-status" class="map-status" role="status">Загружаем карту…</p>
-      </div>
-      <section class="plans-section" aria-label="Три варианта распределения бюджета">
-        <div class="plans-heading"><h2>Три варианта. Разные последствия.</h2><span>Нажмите на план, чтобы сравнить</span></div>
-        <div class="plans" id="plans"></div>
-        <div class="comparison-note"><span id="comparison-note">В первых двух планах одинаковые меры и расходы. Меняются только районы.</span><span class="horizon">Горизонт: 2 года</span></div>
-      </section>
-    </section>
-    <aside class="decision-room" aria-label="Последствия и рекомендации">
-      <div class="room-scroll">
-        <div class="story-kicker"><span id="story-kicker">Сначала — потребности жителей</span><span id="tour-position">1 / 5</span></div>
-        <div class="story-text" aria-live="polite" aria-atomic="true"><h1 id="headline">Кому помощь нужна в первую очередь?</h1><p id="explanation"></p></div>
-        <div class="lesson" id="lesson"></div>
-        <button id="main-action" class="primary">Посмотреть неудачный план <span>→</span></button>
-        <div class="tour-controls"><button id="previous" disabled>← Назад</button><span id="tour-status" role="status">Можно пройти по шагам</span></div>
-        <section class="resident-impact" aria-label="Последствия для жителей района">
-          <div class="section-heading"><h2>Что увидят жители</h2><label><span class="sr-only">Выбрать район</span><select id="district-select"></select></label></div>
-          <div id="impacts"></div>
-          <p class="scale-note">Индексы от 0 до 100. <span class="threshold-key"></span> Ниже 40 — критическая зона.</p>
-        </section>
-        <section class="mayor-takeaway"><h2>Вывод для акима</h2><p id="mayor-takeaway"></p></section>
-        <details class="plan-editor" id="plan-editor"><summary><span>На что идут деньги</span><span id="plan-cost"></span></summary><p class="editor-intro">Смените район проекта и проверьте, кому достанется помощь. Итог пересчитается сразу.</p><div id="editor-result" class="editor-result" role="status" aria-live="polite"></div><div id="project-list"></div><button id="restore-plan" class="text-button">Вернуть исходный вариант</button><div id="validation" role="alert" hidden></div></details>
-        <details class="calculation"><summary>Почему получился такой балл?<span>+</span></summary><div id="calculation"></div></details>
-      </div>
-      <div class="room-footer"><span class="demo-dot"></span><span>Учебные данные. Разбор подготовлен для демо.<br>Числа рассчитаны моделью, а не ИИ.</span></div>
-    </aside>
+    </div>
+    <footer class="auth__foot"><span class="akim-footer-name"><span data-brand>АКИМ</span><span>Прототип для трека акима</span></span><div class="akim-footer-tools"><span>© <span data-year>2026</span></span><button class="icon-button" data-theme-toggle type="button" aria-label="Включить тёмную тему"><i data-icon="moon" aria-hidden="true"></i></button></div></footer>
   </main>
-  <noscript>Включите JavaScript для сравнения сценариев.</noscript>
+  <script type="module" src="./ui.js?v=akim-emblem-2"></script>
 </body>
 </html>
