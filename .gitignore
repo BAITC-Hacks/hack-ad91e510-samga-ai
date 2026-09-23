@@ -7,3 +7,5 @@ __pycache__/
 !.env.example
 !.env.sample
 *.log
+.superpowers/
+.venv/
