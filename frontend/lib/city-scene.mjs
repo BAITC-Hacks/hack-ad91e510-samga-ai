@@ -29,7 +29,7 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
   controls.zoomSpeed=.8;controls.rotateSpeed=.55;controls.update();
   const regions=createCityTerrain(scene),labels=document.createElement('div');labels.className='scene-labels';host.append(labels);
   let disposed=false,frame=null,tween=null,buildingMeshes=[],buildingData=null,selectedOutline=null,inView=true,hovered=null;
-  let lastFocus=Symbol('initial'),lastVersion=-1,clickStart=null,buildingError=false;
+  let lastFocus=Symbol('initial'),lastVersion=-1,clickStart=null,buildingError=false,lastAspect=null;
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
   const labelButtons=regions.map(region=>{
     const button=document.createElement('button');button.type='button';button.className='scene-district-label';button.dataset.district=region.name;
@@ -37,7 +37,7 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
   });
   const popover=document.createElement('div');popover.className='building-popover';popover.hidden=true;host.append(popover);
   const loading=document.createElement('div');loading.className='scene-loading';loading.setAttribute('role','status');loading.textContent='Подготавливаем кварталы…';host.append(loading);
-  function savePose(){state.mapPose={position:camera.position.toArray(),target:controls.target.toArray()};}
+  function savePose(){state.mapPose={position:camera.position.toArray(),target:controls.target.toArray(),aspect:camera.aspect};}
   function schedule(){if(!disposed&&frame===null)frame=requestAnimationFrame(draw);}
   function frameLabels(){
     const width=host.clientWidth,height=host.clientHeight;
@@ -58,11 +58,13 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
     if(inView&&!document.hidden){renderer.render(scene,camera);frameLabels();host.dataset.camera=camera.position.toArray().map(n=>n.toFixed(2)).join(',');}
   }
   function fly(position,target){tween={start:performance.now(),fromPosition:camera.position.clone(),fromTarget:controls.target.clone(),toPosition:position.clone(),toTarget:target.clone()};schedule();}
+  const aspectScale=aspect=>Math.max(1,1.3/aspect);
+  const cityPosition=()=>overviewPosition.clone().sub(overviewTarget).multiplyScalar(aspectScale(camera.aspect)).add(overviewTarget);
   function focusDistrict(name){
     const region=regions.find(r=>r.name===name),coverage=buildingData?.coverage.find(d=>d.name===name);
     const point=coverage?.focus??region?.point;if(!point)return;
     const target=new THREE.Vector3(point[0],0,point[1]);
-    fly(target.clone().add(new THREE.Vector3(14,25,28)),target);
+    fly(target.clone().add(new THREE.Vector3(14,25,28).multiplyScalar(Math.max(1,1/camera.aspect))),target);
   }
   function dismissBuilding(){
     popover.hidden=true;
@@ -110,12 +112,21 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
     if(lastFocus!==state.mapFocus||lastVersion!==state.sceneCameraVersion){
       const initial=typeof lastFocus==='symbol';lastFocus=state.mapFocus;lastVersion=state.sceneCameraVersion;
       dismissBuilding();
-      if(initial&&state.mapPose){camera.position.fromArray(state.mapPose.position);controls.target.fromArray(state.mapPose.target);controls.update();}
-      else if(state.mapFocus)focusDistrict(state.mapFocus);else fly(overviewPosition,overviewTarget);
+      if(initial&&state.mapPose){camera.position.fromArray(state.mapPose.position);controls.target.fromArray(state.mapPose.target);camera.position.sub(controls.target).multiplyScalar(aspectScale(camera.aspect)/aspectScale(state.mapPose.aspect??camera.aspect)).add(controls.target);controls.update();}
+      else if(state.mapFocus)focusDistrict(state.mapFocus);else fly(cityPosition(),overviewTarget);
     }
     if(!state.showBuildings)dismissBuilding();schedule();
   }
-  const resize=()=>{const width=host.clientWidth,height=host.clientHeight;if(!width||!height)return;camera.aspect=width/height;camera.updateProjectionMatrix();renderer.setSize(width,height,false);schedule();};
+  const resize=()=>{
+    const width=host.clientWidth,height=host.clientHeight;if(!width||!height)return;
+    const aspect=width/height;
+    if(lastAspect!==null){
+      const ratio=aspectScale(aspect)/aspectScale(lastAspect);
+      camera.position.sub(controls.target).multiplyScalar(ratio).add(controls.target);
+      if(tween){tween.fromPosition.sub(tween.fromTarget).multiplyScalar(ratio).add(tween.fromTarget);tween.toPosition.sub(tween.toTarget).multiplyScalar(ratio).add(tween.toTarget);}
+    }
+    lastAspect=aspect;camera.aspect=aspect;camera.updateProjectionMatrix();renderer.setSize(width,height,false);host.dataset.viewport=`${width},${height}`;controls.update();schedule();
+  };
   const observer=new ResizeObserver(resize);observer.observe(host);
   const visibility=new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;if(inView)schedule();});visibility.observe(host);
   controls.addEventListener('change',()=>{if(!tween)savePose();schedule();});

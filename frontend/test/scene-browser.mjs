@@ -41,6 +41,10 @@ try{
   await page.locator('.city-webgl-canvas').evaluate(canvas=>canvas.dataset.identity='same-scene');
   await page.locator('[data-action="map-issue"][data-issue="S1"]').click();
   assert.equal(await page.locator('.city-webgl-canvas').getAttribute('data-identity'),'same-scene');
+  await page.locator('[data-action="map-pick"][data-id="M7"]').click();
+  assert.equal(await page.locator('.city-webgl-canvas').getAttribute('data-identity'),'same-scene','Adding a decision keeps the same GPU context');
+  assert.match(await page.locator('.resource-number').innerText(),/^76/);
+  assert.match(await page.locator('.qol-instrument .score-ring').innerText(),/52,56/);
   await page.getByRole('button',{name:'Показать здания',exact:true}).click();
   assert.equal(await page.getByRole('button',{name:'Показать здания',exact:true}).getAttribute('aria-pressed'),'false');
   await page.getByRole('button',{name:'Показать здания',exact:true}).click();
@@ -70,6 +74,8 @@ try{
   await page.locator('[data-action="map-mode"][data-mode="3d"]').click();await page.waitForSelector('#city-3d-host[data-buildings]');
   assert.equal(await page.locator('.city-webgl-canvas').count(),1);
   await page.setViewportSize({width:390,height:844});
+  await page.waitForFunction(()=>Number(document.querySelector('#city-3d-host')?.dataset.viewport?.split(',')[0])<400);
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.locator('.city-map-panel').screenshot({path:`${output}/scene-mobile.png`});
   await page.locator('.city-webgl-canvas').evaluate(canvas=>canvas.getContext('webgl2').getExtension('WEBGL_lose_context').loseContext());
