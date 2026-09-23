@@ -1,6 +1,6 @@
 // Run after starting the server. Works in demo and live modes.
 import {scenarios} from '../docs/brief-analysis/dist/data.mjs';
-const base=process.env.API_URL ?? 'http://127.0.0.1:3001';
+const base=process.env.API_URL ?? 'http://127.0.0.1:4197';
 async function post(path,payload) {
   const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload),signal:AbortSignal.timeout(30000)});
