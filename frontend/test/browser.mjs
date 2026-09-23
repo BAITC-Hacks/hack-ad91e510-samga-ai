@@ -19,16 +19,17 @@ try {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const go = async name => {
-    await page.locator(`.tab[href="#${name}"]`).click();
-    await page.waitForSelector(`.tab[href="#${name}"][aria-current="page"]`);
+    const nav = await page.locator('.control-sidebar').isVisible() ? '.side-link' : '.tab';
+    await page.locator(`${nav}[href="#${name}"]`).click();
+    await page.waitForSelector(`${nav}[href="#${name}"][aria-current="page"]`);
   };
-  await page.goto(origin);
-  await page.waitForSelector('.home-grid');
+  await page.goto(`${origin}/?map=2d`);
+  await page.waitForSelector('#city-map');
   assert.match(await page.locator('.score-ring').innerText(),/52,56/);
   await page.screenshot({path:`${output}/home-desktop.png`,fullPage:true});
   const overflow = async () => assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),false,'No horizontal overflow');
   await overflow();
-  await page.getByRole('link',{name:'Начать управление'}).click();
+  await go('decisions');
   await page.waitForSelector('.decision-card');
   assert.equal(await page.locator('.decision-card').count(),14);
   assert.equal(await page.locator('[data-action="calculate"]').isDisabled(),true);

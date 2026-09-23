@@ -1,0 +1,2 @@
+import { Icon } from './Icon.mjs';
+export const JourneyProgress=active=>`<ol class="journey-progress" aria-label="Как устроено управление">${['Понять задачу','Принять 5 решений','Увидеть последствия'].map((label,index)=>`<li class="${index===active?'current':index<active?'complete':''}" ${index===active?'aria-current="step"':''}><span>${index<active?Icon('check'):String(index+1).padStart(2,'0')}</span>${label}</li>`).join('')}</ol>`;
