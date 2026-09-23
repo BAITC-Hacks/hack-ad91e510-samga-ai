@@ -12,11 +12,13 @@ export async function createComparisonMap({onSelect,onStatus}) {
     map.fitBounds([[71.383,51.115],[71.495,51.203]],{padding:{top:28,right:35,bottom:48,left:35},pitch:20,bearing:-8,duration:reducedMotion?0:duration,maxZoom:13});
   }
   function setView(next){
+    const unchanged=mode===next;
     mode=next;
     document.getElementById('city-view').setAttribute('aria-pressed',String(mode==='city'));
     document.getElementById('district-view').setAttribute('aria-pressed',String(mode==='districts'));
     if(!ready)return;
     if(view)present(view);
+    if(unchanged)return;
     if(mode==='districts')fitOverview();
     else map.flyTo({...cityView,duration:reducedMotion?0:1000});
   }
@@ -103,7 +105,7 @@ export async function createComparisonMap({onSelect,onStatus}) {
       ready=true;if(view)present(view);if(mode==='districts')fitOverview(0);
       map.once('idle',()=>onStatus(''));
     });
-    document.getElementById('overview').onclick=()=>setView(mode);
+    document.getElementById('overview').onclick=()=>{if(mode==='districts')fitOverview();else map.flyTo({...cityView,duration:reducedMotion?0:1000});};
     document.getElementById('city-view').onclick=()=>setView('city');
     document.getElementById('district-view').onclick=()=>setView('districts');
     document.getElementById('zoom-in').onclick=()=>map.zoomIn({duration:reducedMotion?0:250});
