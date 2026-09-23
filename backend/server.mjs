@@ -18,7 +18,19 @@ async function readJson(req){
  try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}
  catch{throw new ApiError(400,'INVALID_JSON','Некорректный JSON.');}
 }
-const staticFiles={'/':['index.html','text/html'],'/workbench.js':['workbench.js','text/javascript'],'/workbench.css':['workbench.css','text/css']};
+const staticFiles={
+ '/':['demos/astana-city/index.html','text/html'],
+ '/city/':['demos/astana-city/index.html','text/html'],
+ '/analytics/':['analytics/public/index.html','text/html'],
+ '/workbench.js':['analytics/public/workbench.js','text/javascript'],
+ '/workbench.css':['analytics/public/workbench.css','text/css'],
+ '/analytics/workbench.js':['analytics/public/workbench.js','text/javascript'],
+ '/analytics/workbench.css':['analytics/public/workbench.css','text/css']
+};
+for(const [file,type] of Object.entries({'app.mjs':'text/javascript','simulator.mjs':'text/javascript','style.css':'text/css','simulator.css':'text/css','base-style.json':'application/json','astana.geojson':'application/json','vendor/maplibre-gl.js':'text/javascript','vendor/maplibre-gl.css':'text/css'})){
+ staticFiles['/city/'+file]=['demos/astana-city/'+file,type];
+}
+for(const file of ['data.mjs','model.mjs'])staticFiles['/docs/brief-analysis/dist/'+file]=['docs/brief-analysis/dist/'+file,'text/javascript'];
 const postPaths=['/api/simulate','/api/analyze','/api/compare','/api/search','/api/facts','/api/evidence','/api/assistant'];
 function only(input,keys){
  if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!keys.includes(k)))
@@ -39,8 +51,8 @@ export function createApp(config={}){
    }
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
    if(req.method==='GET'&&Object.hasOwn(staticFiles,req.url)){
-    const [file,type]=staticFiles[req.url],body=await readFile(new URL('../analytics/public/'+file,import.meta.url));
-    res.writeHead(200,{'Content-Type':type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(body);return;
+    const [file,type]=staticFiles[req.url],body=await readFile(new URL('../'+file,import.meta.url));
+    res.writeHead(200,{'Content-Type':type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(req.url==='/'?body.toString().replace('<head>','<head><base href="/city/">'):body);return;
    }
    if(req.method==='GET'&&req.url==='/api/health')return send(200,{status:'ok',contractVersion:'1',aiMode:config.mode??'openai',aiConfigured:Boolean(config.apiKey&&config.model),modelVersion:MODEL_INFO.version});
    if(req.method==='GET'&&req.url==='/api/contracts')return send(200,{requestSchema,analysisSchema,simulateSchema,model:MODEL_INFO});
