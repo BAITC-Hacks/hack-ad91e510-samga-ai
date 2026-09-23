@@ -1,10 +1,11 @@
 import {indicators,districts,measures} from './data.mjs';
 
 const catalog=new Map(measures.map(m=>[m.id,m]));
-export function validate(choices){
+// allowIncomplete нужен только редактору; evaluate() всегда требует ровно пять.
+export function validate(choices,{allowIncomplete=false}={}){
  const errors=[];
  if(!Array.isArray(choices)) return ['Передайте список решений.'];
- if(choices.length!==5)errors.push('Нужно ровно 5 решений.');
+ if(choices.length>5||(!allowIncomplete&&choices.length!==5))errors.push('Нужно ровно 5 решений.');
  const used=new Set(),counts={}; let cost=0;
  for(const c of choices){
   const m=catalog.get(c?.id);
