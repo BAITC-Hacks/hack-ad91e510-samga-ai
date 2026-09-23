@@ -37,7 +37,7 @@ export function createFrontendServer({ apiOrigin = process.env.SAMGA_API_ORIGIN 
       if (path === '/catalog.json') return json(200, { measures, indicators, districts });
       const relative = decodeURIComponent(path === '/' ? '/index.html' : path);
       const target = resolve(root, `.${relative}`);
-      const allowed = ['index.html','app.mjs','styles.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs';
+      const allowed = ['index.html','app.mjs','styles.css','control.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs';
       if (!target.startsWith(root + sep) || !allowed || !mime[extname(target)]) return json(404, { error: 'Страница не найдена.' });
       const data = await readFile(target);
       res.writeHead(200, { 'Content-Type':mime[extname(target)] }); res.end(req.method === 'HEAD' ? undefined : data);

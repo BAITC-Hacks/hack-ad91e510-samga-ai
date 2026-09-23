@@ -7,6 +7,7 @@ import { Districts } from './screens/Districts.mjs';
 import { Result } from './screens/Result.mjs';
 import { DistrictSheet } from './components/DistrictSheet.mjs';
 import { AIInsightCard } from './components/AIInsightCard.mjs';
+import { ControlShell } from './components/ControlShell.mjs';
 import { selectionReason, restoreChoices, STORAGE_KEY } from './lib/scenario.mjs';
 import { esc } from './lib/format.mjs';
 import { animateNumbers, haptic } from './lib/motion.mjs';
@@ -19,7 +20,7 @@ let scenarioRevision = 0;
 export function render() {
   const focused = document.activeElement?.dataset.focus;
   const view = screens[state.view] ?? Home;
-  app.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand" href="#home" aria-label="SAMGA AI — Сегодня"><span class="brand-mark">${Icon('city')}</span><span>SAMGA<span class="brand-ai"> AI</span></span></a><div class="topbar-right"><span class="session-label"><i class="status-dot"></i>${state.data.demo ? 'Демо-сценарий' : 'Городской симулятор'}</span><button class="icon-button" data-action="about" aria-label="О симуляторе">${Icon('info')}</button></div></header><main id="content" tabindex="-1">${view(state)}</main><footer class="app-footer"><span>SAMGA AI</span><span>Ваш взгляд на будущее Астаны</span></footer></div>${GlassTabBar(state.view)}`;
+  app.innerHTML = ControlShell(view(state),state);
   animateNumbers(app);
   if (state.view === 'result' && state.result) state.animateResult = false;
   if (focused) app.querySelector(`[data-focus="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
