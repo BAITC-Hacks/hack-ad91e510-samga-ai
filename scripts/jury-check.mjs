@@ -79,11 +79,19 @@ export async function runJuryCheck(base,{liveAi=false,includeSearch=true}={}){
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- const args=process.argv.slice(2),urlAt=args.indexOf('--url'),liveAi=args.includes('--live-ai');
- if(args.some((arg,i)=>arg!=='--url'&&arg!=='--live-ai'&&(urlAt<0||i!==urlAt+1))||(urlAt>=0&&urlAt===args.length-1))throw new Error('Usage: node scripts/jury-check.mjs [--url http://127.0.0.1:4197] [--live-ai]');
+ const args=process.argv.slice(2),usage='Usage: node scripts/jury-check.mjs [--url http://127.0.0.1:4197] [--live-ai]';
+ let target=null,liveAi=false;
+ for(let i=0;i<args.length;i++){
+  if(args[i]==='--live-ai'){if(liveAi)throw new Error(usage);liveAi=true;}
+  else if(args[i]==='--url'){
+   if(target||!args[i+1]||args[i+1].startsWith('--'))throw new Error(usage);
+   target=args[++i];
+   try{if(!['http:','https:'].includes(new URL(target).protocol))throw new Error();}catch{throw new Error(usage);}
+  }else throw new Error(usage);
+ }
  let app;
  try{
-  let base=urlAt>=0?args[urlAt+1]:null;
+  let base=target;
   if(liveAi&&!base)throw new Error('--live-ai requires --url of the configured running server');
   if(!base){app=createApp({mode:'demo'});app.listen(0,'127.0.0.1');await once(app,'listening');base='http://127.0.0.1:'+app.address().port;}
   const result=await runJuryCheck(base,{liveAi});console.log(JSON.stringify(result,null,2));

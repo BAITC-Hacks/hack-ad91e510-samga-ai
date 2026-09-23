@@ -25,12 +25,14 @@ export function createBriefingSession({request,onChange=()=>{}}){
    try{
     const r=await request('/api/search',constraints);
     if(version!==revision)return;
-    state.search=r;
+    if(r.search!=='exhaustive'||!['optimal','infeasible'].includes(r.status))throw new Error('Поиск не подтвердил полный перебор. Предыдущий план сохранён.');
     if(r.status==='infeasible'){
+     state.search=r;
      state.error='При этих условиях допустимого плана нет. На экране сохранён предыдущий расчёт. Измените бюджет или ограничения.';
      return;
     }
-    if(r.status!=='optimal'||!r.scenario)throw new Error('Поиск не подтвердил оптимальный результат. Попробуйте ещё раз.');
+    if(!r.scenario)throw new Error('Поиск не подтвердил оптимальный результат. Попробуйте ещё раз.');
+    state.search=r;
     state.choices=r.scenario.choices;
     state.title={score:'Максимальный общий результат',cost:'Меньше расходов при заданных условиях',weakest:'Приоритет слабейшему району',air:'Приоритет качеству воздуха'}[r.constraints.objective];
     await refresh(version);
