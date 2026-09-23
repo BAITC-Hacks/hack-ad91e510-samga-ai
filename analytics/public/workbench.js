@@ -18,10 +18,50 @@ function stats(){
  ['Слабейший район',r?fmt(r.minimum):'—','Баллы района'],['Критические показатели',r?String(r.critical):'—','Строго ниже 40']].map(([a,b,c])=>'<div class="stat"><label>'+a+'</label><strong>'+b+'</strong><small>'+c+'</small></div>').join('');
  $('export').disabled=!current;$('save').disabled=!current;$('facts').disabled=!current;$('ai-analyze').disabled=!current;
 }
+const shortNames={M1:'Автобусные полосы',M2:'Умные светофоры',M3:'Линия ЛРТ',M4:'Парк или сквер',M5:'Чистое топливо',M6:'Озеленение города',M7:'Школа и детсад',M8:'Семейная поликлиника',M9:'Дворовые спорт-хабы',M10:'Освещение и камеры',M11:'Безопасные переходы',M12:'Обращения жителей',M13:'Обновление теплосетей и водосетей',M14:'Аварийные бригады'};
+let editingId=null,pickedId=null,editVersion=0,draftChoices=null,previewValid=false;
 function renderPlan(){
- $('count').textContent=choices.length+' / 5';
- $('plan').innerHTML=choices.map(c=>{const m=byId(c.id);return '<div class="planrow"><div class="between"><div><small>'+esc(catalog.groups[m.group])+' · '+m.id+'</small><strong>'+esc(m.name)+'</strong></div><button data-remove="'+m.id+'" aria-label="Удалить '+esc(m.name)+'">×</button></div><div class="between">'+(m.type==='city'?'<small>Все районы</small>':'<select data-change="'+m.id+'" aria-label="Район для '+esc(m.name)+'">'+catalog.districts.map(d=>'<option '+(d.name===c.district?'selected':'')+'>'+esc(d.name)+'</option>').join('')+'</select>')+'<small>'+m.cost+' ед.</small></div></div>';}).join('')||'<p>Добавьте мероприятия из каталога.</p>';
- stats();
+ const cost=choices.reduce((sum,c)=>sum+byId(c.id).cost,0);
+ $('count').textContent=choices.length+' из 5';
+ $('plan-budget').innerHTML='<div class="between"><strong>'+cost+' <small>из 100 ед.</small></strong><span class="'+(cost>100?'negative':'')+'">Осталось '+(100-cost)+'</span></div><div class="budget-track"><i style="width:'+Math.min(100,cost)+'%;'+(cost>100?'background:#ad4934':'')+'"></i></div>';
+ $('plan').innerHTML=choices.map((c,i)=>{const m=byId(c.id);return '<div class="decision-row"><span class="decision-number">'+(i+1)+'</span><div class="decision-info"><button class="decision-name" data-edit="'+m.id+'">'+esc(shortNames[m.id])+'</button><span class="decision-place">'+esc(c.district??'Весь город')+'</span></div><div class="decision-end"><strong>'+m.cost+' <small>ед.</small></strong><button class="replace-link" data-edit="'+m.id+'" aria-label="Заменить '+esc(shortNames[m.id])+'">Заменить</button></div></div>';}).join('')+
+ Array.from({length:Math.max(0,5-choices.length)},(_,i)=>'<button class="empty-decision" data-new="true"><span>'+(choices.length+i+1)+'</span>Выбрать решение <b>+</b></button>').join('');
+ $('catalog-open').hidden=true;stats();
+}
+function openEditor(id=null){
+ editingId=id;pickedId=id;draftChoices=null;previewValid=false;editVersion++;
+ const c=choices.find(c=>c.id===id);
+ $('catalog-title').textContent=id?'Изменить решение':'Добавить решение';
+ $('catalog-context').textContent=id?'Сейчас: '+shortNames[id]+' · '+(c.district??'весь город')+' · '+byId(id).cost+' ед.':'Выберите проект и район. Общий бюджет — 100 единиц.';
+ $('editor-district').innerHTML=catalog.districts.map(d=>'<option '+(d.name===(c?.district??catalog.districts[focus].name)?'selected':'')+'>'+esc(d.name)+'</option>').join('');
+ $('filter').value='';$('group').value='';
+ $('editor-apply').disabled=true;$('editor-apply').textContent=id?'Сохранить изменения':'Добавить в план';
+ $('editor-remove').hidden=!id;$('editor-preview').textContent=id?'Выберите другой проект или измените район.':'Выберите проект из списка.';
+ renderCatalog();$('catalog').showModal();$('catalog').scrollTop=0;document.querySelector('.editor-body').scrollTop=0;
+}
+async function previewEdit(){
+ const ticket=++editVersion;
+ if(!pickedId)return;
+ const m=byId(pickedId),choice=m.type==='city'?{id:m.id}:{id:m.id,district:$('editor-district').value};
+ draftChoices=editingId?choices.map(c=>c.id===editingId?choice:{...c}):[...choices,choice];
+ $('editor-apply').disabled=true;previewValid=false;
+ renderCatalog();
+ const delta=draftChoices.reduce((sum,c)=>sum+byId(c.id).cost,0)-choices.reduce((sum,c)=>sum+byId(c.id).cost,0);
+ const cost=draftChoices.reduce((sum,c)=>sum+byId(c.id).cost,0);
+ const lead='<div class="preview-numbers"><span>План <b>'+cost+' / 100</b></span><span>Изменение бюджета <b>'+(delta>0?'+':'')+delta+' ед.</b></span></div>';
+ if(draftChoices.length<5){
+  previewValid=cost<=100;$('editor-preview').innerHTML=lead+'<p class="small">'+(previewValid?'Для итогового расчёта выберите ещё '+(5-draftChoices.length)+' решения.':'Недостаточно бюджета для этого проекта.')+'</p>';
+  $('editor-apply').disabled=!previewValid;return;
+ }
+ $('editor-preview').innerHTML=lead+'<p class="small">Проверяем совместимость и последствия…</p>';
+ try{
+  const r=await post('/api/simulate',{choices:draftChoices});
+  if(ticket!==editVersion)return;
+  const same=current?.scenarioId===r.scenarioId;
+  previewValid=!same;
+  $('editor-preview').innerHTML=lead+'<div class="preview-numbers"><span>Score <b>'+(current?fmt(current.result.score)+' → ':'')+fmt(r.result.score)+'</b></span><span>Критических <b>'+r.result.critical+'</b></span></div><p class="small">'+(same?'Это текущее решение. Выберите замену или другой район.':'✓ План допустим. Изменения вступят в силу после сохранения.')+'</p>';
+  $('editor-apply').disabled=!previewValid;
+ }catch(e){if(ticket!==editVersion)return;$('editor-preview').innerHTML=lead+'<div class="error">'+esc(e.message)+'</div>';}
 }
 async function calculate(){
  const rev=++revision;current=null;candidate=null;$('candidate').textContent='';$('answer').textContent='';$('validation').textContent='Проверяем план…';renderPlan();
@@ -65,11 +105,11 @@ async function renderView(){
  $('view').innerHTML='<div class="formula"><h2>Проверяемая модель</h2><p>Score = 0,7 × средний балл + 0,3 × слабейший район − число критических показателей.</p><p>Эффект меры: (8 − лаг) / 8. Синергии без лага. Шкала 0–100. Средний балл учитывает доли населения.</p><p>Рабочие правила DOCX; неоднозначность PDF о пяти направлениях ещё требует уточнения.</p><small>Версия '+esc(catalog.model.version)+' · '+esc(current.scenarioId)+'</small></div>'+evidenceHtml(r);
 }
 function renderCatalog(){
- const query=$('filter').value.toLocaleLowerCase('ru'),group=$('group').value;
- $('catalog-list').innerHTML=catalog.measures.filter(m=>(!group||m.group===group)&&m.name.toLocaleLowerCase('ru').includes(query)).map(m=>{
- const chosen=choices.some(c=>c.id===m.id);
- return '<article class="catalogcard"><div class="between"><small>'+esc(catalog.groups[m.group])+' · '+m.id+'</small><b>'+m.cost+' ед.</b></div><h3>'+esc(m.name)+'</h3><p>Лаг '+m.lag+' квартала · '+(m.type==='city'?'все районы':'один район')+'</p><div class="effect">'+Object.entries(m.effects).map(([id,v])=>esc(catalog.indicators.find(x=>x.id===id).name)+': '+(v>0?'+':'')+v).join(' · ')+'<br>Эффект из каталога; итог уменьшается с учётом лага.</div><div class="between">'+(m.type==='district'?'<select data-target="'+m.id+'" aria-label="Район '+m.id+'">'+catalog.districts.map(d=>'<option '+(d.name==='Нура'?'selected':'')+'>'+d.name+'</option>').join('')+'</select>':'<small>Городская мера</small>')+'<button data-add="'+m.id+'" '+(chosen?'disabled':'')+'>'+(chosen?'В плане':'Добавить')+'</button></div></article>';
- }).join('')||'<p>Мероприятия не найдены.</p>';
+ const query=$('filter').value.toLocaleLowerCase('ru'),group=$('group').value,old=editingId?byId(editingId):null;
+ $('catalog-list').innerHTML=catalog.measures.filter(m=>(!group||m.group===group)&&(m.name+' '+shortNames[m.id]).toLocaleLowerCase('ru').includes(query)).sort((a,b)=>{const rank=m=>m.id===editingId?-2:choices.some(c=>c.id===m.id)?2:old&&m.group===old.group?-1:0;return rank(a)-rank(b);}).map(m=>{
+ const occupied=choices.some(c=>c.id===m.id&&c.id!==editingId),selected=pickedId===m.id,difference=m.cost-(old?.cost??0);
+ return '<article class="project-option '+(selected?'selected':'')+'"><button class="project-pick" data-pick="'+m.id+'" '+(occupied?'disabled':'')+' aria-pressed="'+selected+'"><span class="project-check">'+(selected?'✓':'')+'</span><span class="project-copy"><strong>'+esc(shortNames[m.id])+'</strong><small>'+esc(catalog.groups[m.group])+' · '+(m.type==='city'?'Весь город':esc($('editor-district').value))+'</small></span><span class="project-price"><b>'+m.cost+' ед.</b><small>'+(occupied?'Уже в плане':m.id===editingId?'Текущее':old?(difference>0?'+':'')+difference+' к бюджету':'')+'</small></span></button><details class="project-details"><summary>Что изменится</summary><p>'+esc(m.name)+'. Срок до начала эффекта: '+m.lag+' квартала.</p><p>'+Object.entries(m.effects).map(([id,v])=>esc(catalog.indicators.find(x=>x.id===id).name)+': '+(v>0?'+':'')+v).join(' · ')+'.</p><small>Эффекты каталога; итог рассчитывается с учётом лага и синергий.</small></details></article>';
+ }).join('')||'<p>Ничего не найдено. Измените поиск или направление.</p>';
 }
 function analysisHtml(r){const a=r.analysis;return '<div class="notice">'+(r.mode==='openai'?'AI выбрал значимые факты; текст и числа проверены сервером.':r.mode==='demo'?'Демонстрационный ответ, без вызова AI.':'Проверенный разбор по правилам модели, без вызова AI.')+'</div><p>'+esc(a.summary)+'</p>'+[['strengths','Улучшения'],['risks','Риски и ограничения'],['recommendations','Следующая гипотеза']].map(([k,t])=>'<h3>'+t+'</h3><ul>'+a[k].map(x=>'<li>'+esc(x.text)+' <button class="source-link" data-tab="evidence">Основание</button></li>') .join('')+'</ul>').join('');}
 async function explanation(ai=false){
@@ -108,13 +148,9 @@ async function ask(event){
 }
 document.addEventListener('click',run(async e=>{
  const el=e.target.closest('button,[data-focus]');if(!el)return;
- if(el.dataset.remove){choices=choices.filter(c=>c.id!==el.dataset.remove);await calculate();}
- if(el.dataset.add){
-  if(choices.length>=5){toast('Сначала удалите одну из пяти мер.');return;}
-  const m=byId(el.dataset.add),c={id:m.id};
-  if(m.type==='district')c.district=document.querySelector('[data-target="'+m.id+'"]').value;
-  choices.push(c);renderCatalog();await calculate();toast('Мера добавлена');
- }
+ if(el.dataset.edit){openEditor(el.dataset.edit);}
+ if(el.dataset.new){openEditor();}
+ if(el.dataset.pick){pickedId=el.dataset.pick;await previewEdit();}
  if(el.dataset.focus!==undefined){focus=Number(el.dataset.focus);overview();}
  if(el.dataset.tab){tab=el.dataset.tab;await renderView();}
  if(el.dataset.years){
@@ -123,8 +159,13 @@ document.addEventListener('click',run(async e=>{
  }
 }));
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset.focus!==undefined){focus=Number(e.target.dataset.focus);overview();}});
-$('plan').addEventListener('change',run(async e=>{if(e.target.dataset.change){choices.find(c=>c.id===e.target.dataset.change).district=e.target.value;await calculate();}}));
-$('catalog-open').onclick=()=>{renderCatalog();$('catalog').showModal();};$('catalog-close').onclick=()=>$('catalog').close();
+$('catalog-open').onclick=()=>openEditor();
+function closeEditor(){editVersion++;$('catalog').close();}
+$('catalog-close').onclick=closeEditor;$('editor-cancel').onclick=closeEditor;
+$('catalog').addEventListener('cancel',()=>{editVersion++;});
+$('editor-district').onchange=run(previewEdit);
+$('editor-apply').onclick=run(async()=>{if(!previewValid||!draftChoices)return;const updated=structuredClone(draftChoices);closeEditor();choices=updated;await calculate();toast('Решение обновлено. Последствия пересчитаны.');});
+$('editor-remove').onclick=run(async()=>{if(!editingId)return;choices=choices.filter(c=>c.id!==editingId);closeEditor();await calculate();toast('Решение убрано. Выберите проект в свободной строке.');});
 $('filter').oninput=renderCatalog;$('group').onchange=renderCatalog;
 $('example').onclick=run(async()=>{choices=structuredClone(example);await calculate();});
 $('save').onclick=()=>{saved=structuredClone(current);toast('План сохранён. Измените решения и откройте сравнение.');};
