@@ -55,6 +55,7 @@ python3 -m http.server 4193 --bind 127.0.0.1 --directory docs/brief-analysis/dis
 ```sh
 node --test docs/brief-analysis/test/model.test.mjs
 node --test demos/astana-story/comparison.test.mjs
+node --test demos/astana-story/planner.test.mjs
 node --check docs/brief-analysis/dist/app.mjs
 node --check docs/brief-analysis/dist/model.mjs
 node --check docs/brief-analysis/dist/data.mjs

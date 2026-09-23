@@ -61,7 +61,7 @@ git switch -c your-name/task
 `demos/astana-story/`, проверьте результат в браузере и выполните:
 
 ```sh
-node --test docs/brief-analysis/test/model.test.mjs demos/astana-story/comparison.test.mjs
+node --test docs/brief-analysis/test/model.test.mjs demos/astana-story/comparison.test.mjs demos/astana-story/planner.test.mjs
 node --check demos/astana-story/app.mjs
 ```
 
