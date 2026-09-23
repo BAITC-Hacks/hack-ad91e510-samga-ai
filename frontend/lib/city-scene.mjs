@@ -3,6 +3,7 @@ import { OrbitControls } from '../vendor/three/OrbitControls.js';
 import { createCityTerrain,createBuildingMeshes,buildingForFace,buildingOutline } from './scene-meshes.mjs';
 import { activeSnapshot,districtIssues } from './district-insights.mjs';
 import { esc,fmt } from './format.mjs';
+import { scenePalette as palette } from './scene-palette.mjs';
 
 const overviewPosition=new THREE.Vector3(230,310,360),overviewTarget=new THREE.Vector3(25,0,5);
 let buildingsPromise;
@@ -14,14 +15,14 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.setClearColor(0x091523,0);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
+  renderer.setClearColor(palette.background,0);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
   renderer.domElement.className='city-webgl-canvas';renderer.domElement.tabIndex=0;
   renderer.domElement.setAttribute('aria-label','3D-карта Астаны. Вращайте мышью или стрелками. Enter приближает выбранный район, Escape возвращает город.');
   host.append(renderer.domElement);
   const scene=new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xd4eeff,0x172b35,1.2));
-  const sun=new THREE.DirectionalLight(0xe6faff,1.8);sun.position.set(-120,280,180);scene.add(sun);
-  const rim=new THREE.DirectionalLight(0x8dcbd9,.7);rim.position.set(170,60,-180);scene.add(rim);
+  scene.add(new THREE.HemisphereLight(palette.skyLight,palette.groundLight,1.2));
+  const sun=new THREE.DirectionalLight(palette.sunLight,1.8);sun.position.set(-120,280,180);scene.add(sun);
+  const rim=new THREE.DirectionalLight(palette.rimLight,.7);rim.position.set(170,60,-180);scene.add(rim);
   const camera=new THREE.PerspectiveCamera(43,1,.15,2400);camera.position.copy(overviewPosition);
   const controls=new OrbitControls(camera,renderer.domElement);controls.target.copy(overviewTarget);
   controls.enableDamping=true;controls.dampingFactor=.14;controls.minDistance=12;controls.maxDistance=1350;
@@ -88,10 +89,10 @@ export function createCityScene(host,state,{onDistrict,onOverview,onFallback}={}
     regions.forEach((region,index)=>{
       const district=snapshot.districts.find(d=>d.name===region.name),selected=state.district===region.name;
       const issues=districtIssues(district,state.data.indicators,state.mapLayer).filter(i=>i.value<60);
-      region.top.color.setHex(selected?0x1e5148:hovered===region.name?0x264854:0x153640);
-      region.top.emissive.setHex(selected?0x030c08:0x000000);region.wall.color.setHex(selected?0x286b65:0x1a4553);
-      region.edge.material.color.setHex(selected?0xa1ecd1:0x60969d);region.edge.material.opacity=selected?.9:.55;
-      region.pin.material.color.setHex(issues.some(i=>i.severity==='critical')?0xf6af8c:issues.length?0xdec393:0x89d2b6);
+      region.top.color.setHex(selected?palette.terrainSelected:hovered===region.name?palette.terrainHover:palette.terrain);
+      region.top.emissive.setHex(selected?palette.terrainEmission:0x000000);region.wall.color.setHex(selected?palette.wallSelected:palette.wall);
+      region.edge.material.color.setHex(selected?palette.edgeSelected:palette.edge);region.edge.material.opacity=selected?.9:.55;
+      region.pin.material.color.setHex(issues.some(i=>i.severity==='critical')?palette.critical:issues.length?palette.attention:palette.stable);
       const focusPoint=state.mapFocus===region.name?buildingData?.coverage.find(d=>d.name===region.name)?.focus:null;
       const point=focusPoint??region.point;region.pin.position.set(point[0],2.8,point[1]);region.halo.position.set(point[0],.28,point[1]);
       region.pin.visible=!state.mapFocus;region.halo.visible=region.pin.visible;

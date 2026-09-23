@@ -1,6 +1,7 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { geography } from './astana-geography.mjs';
 import { sceneDistricts,pathRings,svgToWorld,districtAt } from './scene-geography.mjs';
+import { scenePalette as palette } from './scene-palette.mjs';
 
 export const BUILDING_HEIGHT_SCALE=.025;
 function shapeFor(ring) {
@@ -36,30 +37,30 @@ export function createCityTerrain(scene) {
   const regions=sceneDistricts.map((d,index)=>{
     const geometry=new THREE.ExtrudeGeometry(d.rings.filter(r=>r.length>2).map(shapeFor),{depth:5,bevelEnabled:false,curveSegments:1,steps:1});
     geometry.rotateX(-Math.PI/2);geometry.translate(0,-5,0);
-    const top=new THREE.MeshStandardMaterial({color:0x21444d,roughness:.8,metalness:.18});
-    const wall=new THREE.MeshStandardMaterial({color:0x285564,roughness:.7,metalness:.2});
+    const top=new THREE.MeshStandardMaterial({color:palette.terrain,roughness:.8,metalness:.18});
+    const wall=new THREE.MeshStandardMaterial({color:palette.wall,roughness:.7,metalness:.2});
     const mesh=new THREE.Mesh(geometry,[top,wall]);mesh.userData={kind:'district',district:d.name,index};scene.add(mesh);
-    const edge=new THREE.LineSegments(new THREE.EdgesGeometry(geometry,25),new THREE.LineBasicMaterial({color:0x579399,transparent:true,opacity:.65}));scene.add(edge);
-    const pin=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,5,12),new THREE.MeshBasicMaterial({color:0x8ddac4}));
+    const edge=new THREE.LineSegments(new THREE.EdgesGeometry(geometry,25),new THREE.LineBasicMaterial({color:palette.edge,transparent:true,opacity:.65}));scene.add(edge);
+    const pin=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,5,12),new THREE.MeshBasicMaterial({color:palette.halo}));
     pin.position.set(d.point[0],2.8,d.point[1]);pin.userData={kind:'district',district:d.name,index};scene.add(pin);
-    const halo=new THREE.Mesh(new THREE.RingGeometry(2.6,3.1,40),new THREE.MeshBasicMaterial({color:0x8adcc4,transparent:true,opacity:.65,side:THREE.DoubleSide,depthWrite:false}));
+    const halo=new THREE.Mesh(new THREE.RingGeometry(2.6,3.1,40),new THREE.MeshBasicMaterial({color:palette.halo,transparent:true,opacity:.65,side:THREE.DoubleSide,depthWrite:false}));
     halo.rotation.x=-Math.PI/2;halo.position.set(d.point[0],.28,d.point[1]);scene.add(halo);
     return {...d,mesh,edge,pin,halo,top,wall};
   });
-  const roads=linesFromPaths(geography.roads.map(r=>r.path),0x668794,.18,.48);scene.add(roads);
-  scene.add(linesFromPaths(geography.water.filter(w=>w.kind!=='area').map(w=>w.path),0x88cada,.24,.9));
-  scene.add(flatAreas(geography.water.filter(w=>w.kind==='area').map(w=>w.path),0x548b9e,.19));
-  scene.add(flatAreas(geography.parks,0x32675a,.09));
-  const grid=new THREE.GridHelper(1600,80,0x315366,0x203d4c);grid.position.y=-5.5;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
+  const roads=linesFromPaths(geography.roads.map(r=>r.path),palette.roads,.18,.48);scene.add(roads);
+  scene.add(linesFromPaths(geography.water.filter(w=>w.kind!=='area').map(w=>w.path),palette.river,.24,.9));
+  scene.add(flatAreas(geography.water.filter(w=>w.kind==='area').map(w=>w.path),palette.water,.19));
+  scene.add(flatAreas(geography.parks,palette.parks,.09));
+  const grid=new THREE.GridHelper(1600,80,palette.gridMajor,palette.gridMinor);grid.position.y=-5.5;grid.material.transparent=true;grid.material.opacity=.35;scene.add(grid);
   for(const radius of [280,292]){
-    const ring=new THREE.Mesh(new THREE.RingGeometry(radius,radius+.18,160),new THREE.MeshBasicMaterial({color:0x3d6678,transparent:true,opacity:.3,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=-5.4;scene.add(ring);
+    const ring=new THREE.Mesh(new THREE.RingGeometry(radius,radius+.18,160),new THREE.MeshBasicMaterial({color:palette.orbit,transparent:true,opacity:.3,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=-5.4;scene.add(ring);
   }
   return regions;
 }
 export function createBuildingMeshes(scene,data) {
   return sceneDistricts.map((district,districtIndex)=>{
     const positions=[],colors=[],ranges=[];
-    const roof=new THREE.Color(0x9bb9bf),wall=new THREE.Color(0x668995);
+    const roof=new THREE.Color(palette.roof),wall=new THREE.Color(palette.buildingWall);
     const vertex=(x,y,z,color)=>{positions.push(x,y,z);colors.push(color.r,color.g,color.b);};
     for(const building of data.buildings.filter(b=>b.d===districtIndex)){
       const p=building.p,base=.22,top=base+Math.min(12.5,building.h*BUILDING_HEIGHT_SCALE);
@@ -87,5 +88,5 @@ export function buildingForFace(ranges,index) {
 export function buildingOutline(building) {
   const geometry=new THREE.ExtrudeGeometry(shapeFor(building.p),{depth:building.h*BUILDING_HEIGHT_SCALE,bevelEnabled:false,steps:1});geometry.rotateX(-Math.PI/2);geometry.translate(0,.24,0);
   const edges=new THREE.EdgesGeometry(geometry);geometry.dispose();
-  return new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0xf2ca87,depthTest:false}));
+  return new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:palette.pickedBuilding,depthTest:false}));
 }

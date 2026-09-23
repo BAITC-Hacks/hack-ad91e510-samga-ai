@@ -1,0 +1,233 @@
+/* Azure glass — unified interface palette inspired by the supplied control-room reference. */
+:root {
+  --brand: #80c9ff;
+  --brand-bright: #b8e5ff;
+  --brand-muted: #88aeda;
+  --brand-surface: #193c67;
+  --brand-border: #426f9e;
+  --ink: #e3efff;
+  --muted: #8da7c8;
+  --green: var(--brand);
+  --accent: #74b9f4;
+  --line: #284366;
+  --glass: #0f2543;
+  background: #07152b;
+}
+body {
+  background: radial-gradient(ellipse at 55% 5%, #183c663d, transparent 60%), #07152b;
+}
+.control-sidebar { background:#091a32; border-right-color:#254366; }
+.control-header { background:#0c2140b8; border-bottom-color:#30557b; box-shadow:0 1px 18px #286cb613; }
+.control-emblem { background:#183d66; border-color:#497bac; color:#b0e2ff; box-shadow:inset 0 1px 0 #a2d9ff26,0 0 22px #4ca9ff0b; }
+.control-wordmark { color:#eff7ff; }
+.control-wordmark>span,.header-location>span,.sidebar-caption { color:#7e9fc5; }
+.header-location>.icon,.header-status { color:#a1cbed; }
+.side-link { color:#87a3c4; }
+.side-link.active { background:#204b78; color:#bde9ff; box-shadow:inset 0 1px 0 #b9e3ff28,inset 0 0 0 1px #4e83b352; }
+.side-link:hover { background:#17385e; color:#d2ebff; }
+.side-link small { background:#8ecfff; color:#12335c; }
+.operator-avatar { background:#244468; border-color:#577fa8; color:#d3eaff; }
+.icon-button { background:#173555; border-color:#335b86; color:#a6c9eb; }
+.icon-button:hover { background:#254d79; }
+.status-dot { background:#88ceff; box-shadow:0 0 0 3px #66b6f414; }
+.workspace-toolbar,.control-footer { color:#6688b0; }
+.workspace-toolbar strong { color:#b2cce7; }
+.workspace-budget,.page-heading p,.dashboard-heading p { color:#9ab4d2; }
+.workspace-budget b,.page-heading h1,.dashboard-heading h1 { color:#e0edff; }
+.title-dot,.dashboard-heading h1>span { color:#8bccff; }
+.instrument-eyebrow,.eyebrow { color:#81a9d3; }
+.model-badge { background:#112d50a1; border-color:#345a83; color:#a4c9ea; }
+.model-badge>i { background:#8dcfff; }
+.instrument-panel,.glass-card {
+  background:linear-gradient(145deg,#142e50d4,#0c203bd9);
+  border-color:#33587bb3;
+  box-shadow:inset 0 1px 0 #b3dcff0b,0 8px 28px #020a170d;
+}
+.instrument-title { color:#a8c9e7; }
+.instrument-title>.icon { color:#699ccb; }
+.instrument-budget-track,.budget-progress,.metric-track { background:#203e60; }
+.instrument-budget-track>span,.budget-progress>span { background:#78bdfa; }
+.resource-number,.attention-number { color:#d9ecff; }
+.resource-number>span,.resource-number small,.qol-meta,.instrument-budget-legend { color:#88a8cc; }
+.qol-instrument .score-ring strong { color:#d7eeff; }
+.qol-instrument .score-ring span { color:#85b5df; }
+.qol-meta>strong { color:#b2d4ef; }
+.ring-track { stroke:#28496f; }
+.ring-value { stroke:#8acdff; filter:drop-shadow(0 0 3px #73c7ff26); }
+.direction-row>span { color:#a4bdda; }
+.direction-row>strong { color:#b7d4ef; }
+.direction-row:hover,.direction-row.active { background:#20497770; }
+.direction-row>span>i { background:#264363; }
+[data-group=T] { --accent:#79c8ff; }
+[data-group=E] { --accent:#79bea5; }
+[data-group=S] { --accent:#d7b381; }
+[data-group=B] { --accent:#afa9e8; }
+[data-group=C] { --accent:#91b9f2; }
+.button.primary { background:#83c7fa; color:#08274b; box-shadow:inset 0 1px 0 #d9f0ff50,0 5px 18px #398cd41a; }
+.button.primary:hover { background:#a7dcff; }
+.button.secondary { background:#1a3a61; border-color:#3c638e; color:#c6e1fa; }
+.button:disabled { background:#233b59; color:#788da8; box-shadow:none; }
+.small-tag { color:#a1bddb; border-color:#3b5c80; }
+.fine-print { color:#839fc1; }
+.budget-header { background:#11294be8; border-color:#426d99; }
+.budget-header-values .budget-remaining strong { color:#a4d8ff; }
+.budget-ready>span { color:#a6bfda; }
+.filters .filter.active { background:#234b76; color:#c5e8ff; border-color:#4a76a5; }
+.filter:hover { background:#1c3b61; }
+.decision-card { background:#102642b0; border-color:#305376; }
+.decision-card.selected { background:#15365adc; border-color:#6591c0; }
+.select-button { background:#1b3b60; border-color:#3e658c; color:#b7d7f4; }
+.select-button:hover:not(:disabled) { background:#2b5480; }
+.select-button.is-selected,.selection-strip button { background:#224b75; border-color:#527ba6; color:#c3e4ff; }
+.district-card { background:#102946c4; border-color:#345779; }
+.district-card.active { background:#193d63dd; border-color:#6795c0; }
+.district-card:hover { background:#23476c; }
+.district-card-score small,.district-open { color:#9bc7eb; }
+.district-card:last-child { background-color:#112e4d; }
+.district-option { background:#163454; border-color:#345b82; }
+.district-option:hover:not(:disabled) { background:#27547c; border-color:#7aa1c9; }
+.district-option-icon,.district-option>.icon { color:#a0c8ed; }
+.result-hero,.budget-hero { background:radial-gradient(ellipse at 50% 0,#254f7745,transparent 70%),#102a4c; border-color:#406e98; }
+.result-eyebrow { color:#b3d8fa; }
+.result-eyebrow>span,.result-message { color:#94b5d6; }
+.score-before,.result-arrow { color:#92b9de; }
+.result-gain { color:#a5d6ff; }
+.result-gain>span { color:#99c0e1; }
+.result-gain.loss { color:#f0ba9f; }
+.result-stats { color:#94b3d5; }
+.result-stats b { color:#d4eaff; }
+.text-link,.ai-card .section-heading h2>.icon { color:#9ecffd; }
+.ai-fact-icon { background:#183751; border-color:#456e95; color:#a2d2f7; }
+.ai-explanation { color:#b5cce4; }
+.skeleton i { background:#244362; }
+dialog { background:#102848; border-color:#4d769e; color:#e3f0ff; }
+.sheet-handle { background:#52779d; }
+.sheet-project { border-color:#345778; color:#c2d9ef; }
+#toast { background:#173956f5; border-color:#5785ab; color:#d9eeff; }
+.boot-mark { background:#193f69; color:#b9e5ff; }
+.skip-link { background:#2c5682; color:#fff; }
+.empty-state>.icon { color:#8cc5f5; }
+
+/* Map and inspector */
+.city-map-panel { background:radial-gradient(ellipse at 50% 40%,#1c47883b,transparent 68%),#091b35; border-color:#3d648f; }
+.map-panel-header { border-bottom-color:#2e4f76; }
+.map-panel-header h2 { color:#dcebff; }
+.map-panel-header h2>span { color:#7c9fc8; }
+.map-stage-switch { background:#0a1c35; border-color:#385c84; }
+.map-stage-switch>button { color:#93b6d9; }
+.map-stage-switch>button.active { background:#2a507d; color:#c6e9ff; box-shadow:inset 0 1px 0 #b9e7ff17; }
+.map-layers>button { color:#84acd5; }
+.map-layers>button.active { background:#1c426e; color:#b6e1ff; border-color:#4977a8; }
+.map-layers>button:hover { background:#234a75; color:#deefff; }
+.map-coordinate,.map-coordinate>span,.map-source { color:#7293bd; }
+.map-source>a,.map-help { color:#90b0d2; }
+.map-north { color:#a6c9ef; }
+.map-north svg { fill:#aacbfa; }
+.map-orbits { stroke:#466b9f; }
+.map-terrain-depth { stroke:#4773a6; }
+#terrain-wall stop:first-child { stop-color:#3d6b9e; }
+#terrain-wall stop:last-child { stop-color:#162f58; }
+.district-terrain,.district-terrain.has-critical { fill:#1a3558; stroke:#4a79a8; }
+.district-terrain.selected { fill:#305f92; stroke:#b0e1ff; }
+.district-terrain:hover,.district-terrain:focus-visible { fill:#3b6d9e; stroke:#ccecff; }
+.map-boundaries path { stroke:#6d9bc8; }
+.map-boundaries path.selected { stroke:#b5e4ff; filter:drop-shadow(0 0 5px #69b3ff45); }
+.map-road { stroke:#7399c7; }
+.map-water { stroke:#8bd3ff; }
+.map-water.area { fill:#517fab; }
+.marker-halo { fill:#78bfff; stroke:#8dcdff45; }
+.marker-ring { fill:#1c3c68; stroke:#a9d9ff; }
+.marker-stem { stroke:#85aedd; }
+.map-label-background { fill:#102a49ed; stroke:#527ba8; }
+.map-district-label.selected .map-label-background,.map-district-label:hover .map-label-background,.map-district-label:focus-visible .map-label-background { fill:#224b76f0; stroke:#9dcbf4; }
+.map-district-label.selected .map-district-name,.map-district-name { fill:#d9eeff; }
+.map-district-value { fill:#afdaff; }
+.map-district-issues { fill:#8badcf; }
+.map-plan-marker { fill:#91ceff; stroke:#254670; }
+.map-plan-count { fill:#123960; }
+.map-controls { background:#112e51ed; border-color:#4f77a2; }
+.map-controls>button { color:#b0d4f6; }
+.map-controls>button+button { border-color:#35577e; }
+.map-controls>button:hover { background:#305987; color:#e2f4ff; }
+.map-legend { color:#8eaecd; }
+.map-legend i.planned { background:#8dcbff; }
+.map-district-selector { border-top-color:#2b4a70; }
+.map-district-selector>button { background:#122c4a; border-color:#31537a; color:#a0bcda; }
+.map-district-selector>button.active { background:#244f7b; border-color:#6590bf; color:#d3eaff; }
+.map-district-selector>button.active>i { background:#b1dcff; }
+.map-district-selector>button>span { color:#accfee; }
+.inspector-score>strong { color:#acd9ff; }
+.inspector-heading h2 { color:#e1efff; }
+.inspector-pop { color:#8aa9cc; }
+.inspector-tabs { border-bottom-color:#315276; }
+.inspector-tabs>.active { color:#abd9ff; border-bottom-color:#8ac9f5; }
+.inspector-tabs>a,.show-all-issues { color:#8eb2dc; }
+.problem-item.selected { background:#204364ad; border-color:#4d7396; }
+.problem-item:hover { background:#1b3758; }
+.problem-item.selected .problem-copy>strong { color:#e0edfa; }
+.problem-copy>strong { color:#bad0e6; }
+.problem-copy>small { color:#8ba9c5; }
+.problem-item>b { color:#b8daf7; }
+.solution-section { border-color:#315171; }
+.solution-heading>span { color:#a1cffe; }
+.solution-heading>small,.solution-context { color:#809fc2; }
+.solution-context>strong { color:#bad7ef; }
+.map-solution { background:#143154a1; border-color:#3e678f; }
+.map-solution.planned { background:#1c3f67b0; border-color:#638fc0; }
+.map-solution-title h3 { color:#c0dafa; }
+.map-solution-title>span { color:#b2ddff; }
+.map-solution-title small,.map-solution-bottom>span { color:#91b3d2; }
+.map-solution-bottom>button { background:#315d86; border-color:#618bb0; color:#d1ecff; }
+.map-solution-bottom>button:hover { background:#4678a5; }
+.solution-note { color:#7f9ab8; }
+.all-measures { border-top-color:#355474; color:#a9d7fa; }
+.scenario-count { color:#c0e4ff; }
+.scenario-slot { background:#132d491f; border-color:#365780; }
+.scenario-slot.filled { background:#1b3d5e96; border-color:#527aa0; }
+.scenario-slot.filled .slot-number { border-color:#6393b6; color:#a0d0f4; }
+.scenario-slot strong { color:#c0e1f9; }
+.scenario-slot>div>span,.scenario-slot>button { color:#8eb6d6; }
+.scenario-dock-footer>p { color:#92b0ce; }
+.scenario-dock-footer>p>.status-dot { background:#74b6e8; }
+.district-overview-title>a { color:#9bcdfa; }
+.district-overview-item strong { color:#b2d3f2; }
+.district-overview-item.selected strong { color:#d1ecff; }
+.overview-bar { background:#223e60; }
+.overview-bar>span { background:#6398cd; }
+.selected .overview-bar>span { background:#99d4ff; }
+
+/* WebGL controls use the same accent as the geographic scene. */
+.scene-toolbar { border-color:#34567c; }
+.scene-breadcrumb>button { color:#94bce2; }
+.scene-breadcrumb>strong { color:#c0e3ff; }
+.scene-level { color:#7a9cc5; }
+.scene-mode-switch { background:#0b213d; border-color:#3c628a; }
+.scene-mode-switch>button { color:#95b6d6; }
+.scene-mode-switch>.active { background:#315d8a; color:#e0f1ff; box-shadow:inset 0 1px 0 #c0e6ff24; }
+.scene-tool { color:#9dc0e1; border-color:#426b92; background:#153254; }
+.scene-tool.active { background:#2a507b; color:#c6e6ff; border-color:#648db3; }
+.scene-tool:hover { background:#3b6793; color:#e7f5ff; }
+.scene-live-badge { color:#a2d8ff; }
+.scene-live-badge::before { background:#93d2ff; box-shadow:0 0 7px #5ab8ff45; }
+.scene-hud>[data-scene-detail],.scene-gesture-hint { color:#91b7db; }
+.scene-gesture-hint>span { color:#6e95bc; }
+.scene-district-label { background:#112d4df0; border-color:#5a8db7; color:#dfedff; }
+.scene-district-label>span { color:#a2c6e7; }
+.scene-district-label.selected { background:#26517ff0; border-color:#93c9f1; color:#ebf6ff; }
+.scene-district-label:hover,.scene-district-label:focus-visible { background:#346996; border-color:#bfe9ff; }
+.scene-loading { background:#183b61ed; color:#c9e6fb; border-color:#5b88b2; }
+.building-popover { background:#112d4df5; border-color:#648db6; }
+.building-popover>.instrument-eyebrow { color:#a4d3f7; }
+.building-popover h3 { color:#e2f1ff; }
+.building-popover>p { color:#9ebedf; }
+.building-popover dl { border-color:#3c5f84; }
+.building-popover dt { color:#89acd0; }
+.building-popover dd { color:#d1e9fb; }
+.building-popover>.building-data-note { color:#86a6c7; }
+.building-popover>a { color:#abdaff; }
+.city-map-panel:fullscreen { background:#081b36; }
+@media(max-width:760px) {
+  .tab-bar { background:#102a4de6; border-color:#517cac; box-shadow:0 15px 40px #02081780,inset 0 1px 0 #b4e3ff26; }
+  .tab { color:#9bb6d6; }
+  .tab.active { background:#2b5682bf; color:#ddf1ff; box-shadow:inset 0 1px 0 #bfebff2e; }
+}
