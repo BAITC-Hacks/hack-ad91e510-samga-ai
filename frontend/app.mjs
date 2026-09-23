@@ -1,7 +1,10 @@
 import { cityService } from './services/api.mjs';
-import { tabs } from './components/GlassTabBar.mjs';
+import { routes } from './components/GlassTabBar.mjs';
 import { Icon } from './components/Icon.mjs';
 import { Dashboard } from './screens/Dashboard.mjs';
+import { Welcome } from './screens/Welcome.mjs';
+import { Manage } from './screens/Manage.mjs';
+import { journeyProblems,selectedProblem,guidedReason } from './lib/journey.mjs';
 import { DEFAULT_CAMERA } from './components/CityMap.mjs';
 import { bindMapInteraction, zoomCamera } from './lib/map-interaction.mjs';
 import { preserveScene,mountScene,sceneZoom,sceneTilt } from './lib/scene-controller.mjs';
@@ -18,17 +21,18 @@ import { animateNumbers, haptic } from './lib/motion.mjs';
 
 const app = document.querySelector('#app');
 export const state = { data:null, choices:[], view:'home', group:'all', district:'Нура', result:null, analysis:null, busy:false, analysisBusy:false, analysisError:'', animateResult:false, mapLayer:'all', mapStage:'before', mapIssue:null, showAllIssues:false, mapCamera:[...DEFAULT_CAMERA], mapMode:new URLSearchParams(location.search).get('map')==='2d'?'2d':'3d', mapFocus:null,mapPose:null,sceneCameraVersion:0,showBuildings:true };
-const screens = { home:Dashboard, decisions:Decisions, districts:Districts, result:Result };
+Object.assign(state,{guideStage:'problem',guideFilter:'all',guideAll:false,guideDistrict:'Нура',guideIssue:'S2',guideLastChoice:null});
+const screens = { home:Welcome, play:Manage, map:Dashboard, decisions:Decisions, districts:Districts, result:Result };
 const sheet = document.querySelector('#sheet');
 let scenarioRevision = 0;
 export function render() {
   const focused = document.activeElement?.dataset.focus;
   const canvasFocused=document.activeElement?.classList.contains('city-webgl-canvas');
-  const view = screens[state.view] ?? Dashboard;
+  const view = screens[state.view] ?? Welcome;
   const preserved=preserveScene(state);
   const markup=ControlShell(view(state),state);
   const fullscreen=document.fullscreenElement;
-  if(fullscreen?.matches('.city-map-panel')&&state.view==='home'){
+  if(fullscreen?.matches('.city-map-panel')&&state.view==='map'){
     const template=document.createElement('template');template.innerHTML=markup;
     fullscreen.innerHTML=template.content.querySelector('.city-map-panel').innerHTML;
   }else app.innerHTML=markup;
@@ -50,7 +54,7 @@ function selectMapDistrict(district){
 function resetMap(){state.mapFocus=null;state.mapPose=null;state.sceneCameraVersion++;state.mapCamera=[...DEFAULT_CAMERA];render();}
 function navigate() {
   const next = location.hash.slice(1);
-  state.view = tabs.some(([key]) => key === next) ? next : 'home';
+  state.view = routes.includes(next) ? next : 'home';
   if (state.data) { render(); window.scrollTo({top:0, behavior:'instant'}); document.querySelector('#content').focus({preventScroll:true}); }
 }
 let toastTimer;
@@ -65,16 +69,22 @@ function saveChoices() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.choices)); } catch { toast('Браузер не сохранил черновик. Сценарий доступен до перезагрузки.'); }
   render();
 }
-function addChoice(id, district) {
+function addChoice(id, district, guided=false) {
   if (state.busy) return;
   const measure = state.data.measures.find(m => m.id === id);
   const reason = selectionReason(state.choices, measure, state.data.measures, district);
   if (reason) return toast(reason);
   if (measure.type === 'district' && !state.data.districts.some(d => d.name === district)) return;
+  if(guided){const blocked=guidedReason(state,measure,district);if(blocked)return toast(blocked);}
   state.choices.push(measure.type === 'city' ? {id} : {id,district});
+  state.guideStage=guided?'confirmation':'problem';
+  if(guided)state.guideLastChoice={id,...(measure.type==='district'?{district}:{})};
   if (sheet.open) sheet.close();
   haptic(); saveChoices(); toast(`Добавлено: ${measure.name}${district ? ` · ${district}` : ''}`);
+  if(guided)focusGuide();
 }
+function focusGuide(){window.scrollTo({top:0,behavior:'instant'});document.querySelector('#content')?.focus({preventScroll:true});}
+function enterGuide(){state.guideStage=state.choices.length===5?'review':'problem';state.guideAll=false;if(state.view==='play'){render();focusGuide();}else location.hash='play';}
 async function calculate() {
   if (state.busy || state.choices.length !== 5) return;
   const revision = scenarioRevision, choices = structuredClone(state.choices);
@@ -110,6 +120,21 @@ document.addEventListener('click', event => {
   if (action === 'about') toast('Учебный симулятор. Данные районов условные; Score рассчитывает модель команды.');
   if (action === 'retry-boot') boot();
   if (!state.data) return;
+  if(action==='guide-start')enterGuide();
+  if(action==='guide-problem'){
+    const problem=journeyProblems(state).find(p=>p.district===district&&p.id===button.dataset.issue);
+    if(!problem?.available)return;
+    state.guideDistrict=district;state.guideIssue=problem.id;state.guideStage='options';render();focusGuide();
+  }
+  if(action==='guide-pick'&&state.guideStage==='options'){
+    const problem=selectedProblem(state),measure=state.data.measures.find(m=>m.id===id);
+    if(measure&&problem&&measure.effects[problem.id]>0)addChoice(id,problem.district,true);
+  }
+  if(action==='guide-back'){state.guideStage='problem';render();focusGuide();}
+  if(action==='guide-more'){state.guideAll=!state.guideAll;render();}
+  if(action==='guide-next'){state.guideStage=state.choices.length===5?'review':'problem';state.guideAll=false;state.guideFilter='all';render();focusGuide();}
+  if(action==='guide-review')state.guideStage=state.choices.length===5?'review':'problem';
+  if(action==='result-map')state.mapStage='after';
   if (action === 'map-district' && state.data.districts.some(d=>d.name===district)) {
     selectMapDistrict(district);
   }
@@ -144,9 +169,12 @@ document.addEventListener('click', event => {
   }
   if (action === 'choose-district') addChoice(id,district);
   if (action === 'close-sheet') sheet.close();
-  if (action === 'remove' && !state.busy) { state.choices = state.choices.filter(c => c.id !== id); haptic(); saveChoices(); }
+  if (action === 'remove' && !state.busy) { state.choices = state.choices.filter(c => c.id !== id); state.guideStage='problem';haptic(); saveChoices(); }
   if (action === 'calculate') calculate();
   if (action === 'retry-analysis' && state.result && !state.analysisBusy) analyze();
+});
+document.addEventListener('change',event=>{
+  if(event.target.matches('[data-guide-filter]')&&state.data&&(event.target.value==='all'||state.data.districts.some(d=>d.name===event.target.value))){state.guideFilter=event.target.value;state.guideAll=false;render();document.querySelector('[data-guide-filter]')?.focus({preventScroll:true});}
 });
 document.addEventListener('keydown',event=>{
   const target=event.target.closest('svg [role="button"][data-action]');

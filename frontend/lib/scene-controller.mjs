@@ -1,11 +1,11 @@
 let current=null,generation=0,pendingHost=null;
 export function preserveScene(state){
-  if(state.view==='home'&&state.mapMode==='3d'&&current){const host=current.host;host.remove();return host;}
+  if(state.view==='map'&&state.mapMode==='3d'&&current){const host=current.host;host.remove();return host;}
   if(current){current.dispose();current=null;}
   pendingHost=null;generation++;return null;
 }
 export function mountScene(state,callbacks,preserved){
-  if(state.view!=='home'||state.mapMode!=='3d')return;
+  if(state.view!=='map'||state.mapMode!=='3d')return;
   let host=document.querySelector('#city-3d-host');if(!host)return;
   if(preserved&&current){host.replaceWith(preserved);current.update();return;}
   if(pendingHost===host)return;

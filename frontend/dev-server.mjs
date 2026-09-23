@@ -37,7 +37,7 @@ export function createFrontendServer({ apiOrigin = process.env.SAMGA_API_ORIGIN 
       if (path === '/catalog.json') return json(200, { measures, indicators, districts });
       const relative = decodeURIComponent(path === '/' ? '/index.html' : path);
       const target = resolve(root, `.${relative}`);
-      const allowed = ['index.html','app.mjs','styles.css','control.css','scene.css','blue.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs' || relative === '/data/astana-buildings.json' || ['/vendor/three/three.module.min.js','/vendor/three/three.core.min.js','/vendor/three/OrbitControls.js'].includes(relative);
+      const allowed = ['index.html','app.mjs','styles.css','control.css','scene.css','blue.css','journey.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs' || relative === '/data/astana-buildings.json' || ['/vendor/three/three.module.min.js','/vendor/three/three.core.min.js','/vendor/three/OrbitControls.js'].includes(relative);
       if (!target.startsWith(root + sep) || !allowed || !mime[extname(target)]) return json(404, { error: 'Страница не найдена.' });
       const data = await readFile(target);
       res.writeHead(200, { 'Content-Type':mime[extname(target)] }); res.end(req.method === 'HEAD' ? undefined : data);
