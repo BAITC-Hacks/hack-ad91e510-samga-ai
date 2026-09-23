@@ -2,52 +2,56 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ASTANA — пять решений для города</title><link rel="icon" href="data:,">
-  <link rel="stylesheet" href="../astana-city/vendor/maplibre-gl.css">
-  <link rel="stylesheet" href="./style.css">
-  <script src="../astana-city/vendor/maplibre-gl.js" defer></script>
-  <script type="module" src="./app.mjs"></script>
+  <title>ASTANA — куда направить бюджет города</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../astana-city/vendor/maplibre-gl.css"><link rel="stylesheet" href="./style.css">
+  <script src="../astana-city/vendor/maplibre-gl.js" defer></script><script type="module" src="./app.mjs"></script>
 </head>
 <body>
-  <div id="map" aria-label="Трёхмерная карта Астаны"></div><div class="vignette"></div>
-  <header class="header">
-    <a class="brand" href="../astana-city/" aria-label="Открыть исходный макет Астаны"><span class="brand-icon">A<span>•</span></span><span>ASTANA<small>CITY LAB / SAMGA AI</small></span></a>
-    <span class="header-divider"></span><span class="project-title">Аким на 5 часов</span>
-    <span class="demo-tag"><i></i> Демонстрационный сценарий</span>
-    <button class="play-button" id="play"><span id="play-icon">▶</span><span id="play-label">Смотреть демо</span></button>
+  <header class="app-header">
+    <a class="brand" href="../astana-city/" aria-label="Открыть исходный макет"><span class="brand-mark">A<span>•</span></span><span>ASTANA<small>SAMGA AI / CITY LAB</small></span></a>
+    <div class="page-name"><strong>Куда направить бюджет города?</strong><span>«Аким на 5 часов» · демонстрация последствий</span></div>
+    <button id="tour" class="tour-button"><span id="tour-icon">▶</span><span id="tour-label">Смотреть разбор</span></button>
+    <button id="reset" class="reset-button" aria-label="Вернуться к началу" title="Вернуться к началу">↶</button>
   </header>
-  <main class="stage">
-    <section class="story" aria-label="Текущий шаг сценария">
-      <div class="chapter"><span id="phase-label">Ваш первый день в роли акима</span><span id="step-count">Начало</span></div>
-      <div class="story-copy" aria-live="polite" aria-atomic="true">
-        <h1 id="story-title">Город ждёт<br>ваших решений.</h1>
-        <p id="story-description">У вас 100 единиц бюджета. Выберите пять проектов и узнайте, как изменится жизнь в городе за два года.</p>
-        <div id="story-details" class="story-details"></div>
+  <main class="workspace">
+    <section class="city-workspace" aria-label="Карта и сравнение планов">
+      <div class="map-toolbar">
+        <div class="map-title"><span class="live-dot"></span><strong id="map-title">Исходный город</strong><span id="map-subtitle">5 районов · бюджет 100</span></div>
+        <div class="view-switch" aria-label="Состояние города"><button id="before" aria-pressed="true">Сейчас</button><button id="after" aria-pressed="false" disabled>Через 2 года</button></div>
       </div>
-      <div class="story-actions"><button class="primary" id="next">Начать выбор <span>→</span></button><button class="back" id="back" aria-label="Предыдущий шаг" disabled>←</button></div>
-      <p class="story-foot" id="story-foot">В демо пять решений уже подобраны. Пройдите их по шагам или включите показ.</p>
+      <div class="map-stage">
+        <div id="map" aria-label="Карта распределения городских проектов"></div>
+        <div class="map-shade"></div>
+        <div id="map-story" class="map-story"><span>Главный вопрос</span><p>Помогут ли ваши решения тем,<br>кому сейчас сложнее всего?</p></div>
+        <div class="map-legend"><span><i class="critical-key"></i> Есть показатели ниже 40</span><span><i class="project-key"></i> Районные проекты</span></div>
+        <div class="map-bottom"><p id="city-program">Выберите район, чтобы увидеть его проблемы.</p><div class="map-controls"><button id="overview">Весь город</button><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button></div></div>
+        <p id="map-status" class="map-status" role="status">Загружаем карту…</p>
+      </div>
+      <section class="plans-section" aria-label="Три варианта распределения бюджета">
+        <div class="plans-heading"><h2>Три варианта. Разные последствия.</h2><span>Нажмите на план, чтобы сравнить</span></div>
+        <div class="plans" id="plans"></div>
+        <div class="comparison-note"><span id="comparison-note">В первых двух планах одинаковые меры и расходы. Меняются только районы.</span><span class="horizon">Горизонт: 2 года</span></div>
+      </section>
     </section>
-    <aside class="pulse" aria-label="Результаты города">
-      <div class="pulse-heading"><span>Качество жизни</span><span class="data-pill" id="score-state">До решений</span></div>
-      <div class="score"><strong id="city-score">52,6</strong><span>/ 100</span></div>
-      <div class="score-note" id="score-note">Стартовая оценка города</div>
-      <div class="score-track"><i id="score-fill"></i></div>
-      <div class="district-labels"><span>Район</span><span id="district-column">Индекс</span></div>
-      <div id="districts" class="districts"></div>
-      <div class="critical"><span class="critical-dot"></span><div><strong id="critical-count">2 критических показателя</strong><p id="critical-note">Школы и медицина в Нуре — ниже 40.</p></div></div>
-      <button id="compare" class="compare" hidden>Сравнить с началом <span>↔</span></button>
-      <p class="model-note">Учебная модель · не городская статистика</p>
+    <aside class="decision-room" aria-label="Последствия и рекомендации">
+      <div class="room-scroll">
+        <div class="story-kicker"><span id="story-kicker">Сначала — потребности жителей</span><span id="tour-position">1 / 5</span></div>
+        <div class="story-text" aria-live="polite" aria-atomic="true"><h1 id="headline">Кому помощь нужна в первую очередь?</h1><p id="explanation"></p></div>
+        <div class="lesson" id="lesson"></div>
+        <button id="main-action" class="primary">Посмотреть неудачный план <span>→</span></button>
+        <div class="tour-controls"><button id="previous" disabled>← Назад</button><span id="tour-status" role="status">Можно пройти по шагам</span></div>
+        <section class="resident-impact" aria-label="Последствия для жителей района">
+          <div class="section-heading"><h2>Что увидят жители</h2><label><span class="sr-only">Выбрать район</span><select id="district-select"></select></label></div>
+          <div id="impacts"></div>
+          <p class="scale-note">Индексы от 0 до 100. <span class="threshold-key"></span> Ниже 40 — критическая зона.</p>
+        </section>
+        <section class="mayor-takeaway"><h2>Вывод для акима</h2><p id="mayor-takeaway"></p></section>
+        <details class="plan-editor" id="plan-editor"><summary><span>На что идут деньги</span><span id="plan-cost"></span></summary><p class="editor-intro">Смените район проекта и проверьте, кому достанется помощь. Итог пересчитается сразу.</p><div id="editor-result" class="editor-result" role="status" aria-live="polite"></div><div id="project-list"></div><button id="restore-plan" class="text-button">Вернуть исходный вариант</button><div id="validation" role="alert" hidden></div></details>
+        <details class="calculation"><summary>Почему получился такой балл?<span>+</span></summary><div id="calculation"></div></details>
+      </div>
+      <div class="room-footer"><span class="demo-dot"></span><span>Учебные данные. Разбор подготовлен для демо.<br>Числа рассчитаны моделью, а не ИИ.</span></div>
     </aside>
-    <div class="map-legend"><i></i><span id="map-caption">Астана · пять районов в модели</span></div>
-    <div class="map-tools"><button id="overview" aria-label="Обзор города" title="Обзор города">⌖</button><button id="tilt" aria-label="Переключить 2D и 3D" aria-pressed="true">3D</button><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button></div>
-    <p id="map-status" class="map-status" role="status">Загружаем карту Астаны…</p>
   </main>
-  <section class="control-deck" aria-label="План развития города">
-    <div class="deck-heading"><div><span class="plan-name">Город для каждого</span><span id="decisions-count">0 из 5 решений</span></div><div class="budget-label">Потрачено <strong id="budget">0</strong><span>/ 100</span><span class="remaining" id="remaining">Осталось 100</span></div></div>
-    <div class="decision-list" id="decisions"></div>
-    <div class="timeline-row"><span id="timeline-label">Сначала — план</span><div class="quarter-track" id="quarters" aria-label="Восемь кварталов"></div><span id="timeline-end">Затем — 2 года развития</span></div>
-  </section>
-  <footer><span>OpenStreetMap · размещение проектов условное</span><span id="play-status" role="status">Можно пройти весь сценарий вручную</span><button id="restart">Начать заново ↶</button></footer>
-  <noscript>Для демонстрации включите JavaScript.</noscript>
+  <noscript>Включите JavaScript для сравнения сценариев.</noscript>
 </body>
 </html>
