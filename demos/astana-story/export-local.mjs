@@ -10,9 +10,10 @@ const entry=await readFile(join(target,'index.html'),'utf8');
 if(!entry.includes('akim-login'))throw new Error('В каталоге назначения не найдена входная группа АКИМ.');
 const output=join(target,'simulator');
 await mkdir(output,{recursive:true});
-for(const file of ['base.css','style.css','theme.js','shell.mjs','widget-layout.mjs','app.mjs','catalog-ui.mjs'])await copyFile(join(source,file),join(output,file));
+for(const file of ['base.css','style.css','theme.js','shell.mjs','widget-layout.mjs','app.mjs','catalog-ui.mjs','assistant-bootstrap.mjs'])await copyFile(join(source,file),join(output,file));
 for(const file of ['onboarding.mjs','onboarding.css'])await copyFile(join(source,file),join(output,file));
 await cp(join(source,'assets'),join(output,'assets'),{recursive:true});
+await cp(join(source,'assistant'),join(output,'assistant'),{recursive:true});
 for(const file of ['comparison.mjs','planner.mjs']){
  const module=(await readFile(join(source,file),'utf8')).replaceAll('../../docs/brief-analysis/dist/','./model/');
  await writeFile(join(output,file),module);
@@ -25,7 +26,7 @@ await mkdir(join(output,'map-assets'),{recursive:true});
 for(const file of ['base-style.json','astana.geojson'])await copyFile(join(source,'../astana-city',file),join(output,'map-assets',file));
 await cp(join(source,'../astana-city/vendor'),join(output,'map-assets/vendor'),{recursive:true});
 let html=await readFile(join(source,'main.html'),'utf8');
-for(const file of ['base.css','style.css','theme.js','shell.mjs','widget-layout.mjs','app.mjs'])html=html.replaceAll('./'+file,'./simulator/'+file);
+for(const file of ['base.css','style.css','theme.js','shell.mjs','widget-layout.mjs','app.mjs','assistant-bootstrap.mjs'])html=html.replaceAll('./'+file,'./simulator/'+file);
 html=html.replaceAll('./onboarding.mjs','./simulator/onboarding.mjs');
 html=html.replaceAll('./assets/','./simulator/assets/').replaceAll('../astana-city/','./simulator/map-assets/');
 try{await access(join(target,'main-template.html'));}

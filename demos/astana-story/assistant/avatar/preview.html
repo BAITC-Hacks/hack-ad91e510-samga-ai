@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Голова ассистента — предпросмотр</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #050d18; color: #d7edf5; }
+    main { width: min(90vw, 680px); }
+    h1 { font-size: 20px; font-weight: 600; }
+    #head { width: 100%; height: min(62vh, 560px); min-height: 340px; border: 1px solid rgba(120, 220, 255, .18); border-radius: 18px; background: radial-gradient(ellipse at center, #0a263d, #050c16 75%); overflow: hidden; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 0; }
+    button { padding: 9px 14px; color: inherit; background: #102636; border: 1px solid #315267; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #1b3a4a; }
+    p { color: #92aab9; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>3D-голова ассистента</h1>
+    <div id="head"></div>
+    <div class="controls">
+      <button data-state="idle">Готов</button>
+      <button data-state="thinking">Думает</button>
+      <button data-state="speaking">Говорит</button>
+      <button data-state="listening">Слушает</button>
+      <button id="replay">Повторить появление</button>
+      <button id="toggle">Скрыть</button>
+    </div>
+    <p>Локальный GLB и локальный Three.js. При скрытии WebGL-сцена удаляется.</p>
+  </main>
+  <script type="module">
+    import { mountHead } from './head.mjs';
+    const host = document.querySelector('#head');
+    let head = mountHead(host);
+    document.querySelectorAll('[data-state]').forEach((button) => {
+      button.addEventListener('click', () => head?.setState(button.dataset.state));
+    });
+    document.querySelector('#replay').addEventListener('click', () => head?.replay());
+    document.querySelector('#toggle').addEventListener('click', (event) => {
+      if (head) {
+        head.dispose();
+        head = null;
+        event.currentTarget.textContent = 'Показать';
+      } else {
+        head = mountHead(host);
+        event.currentTarget.textContent = 'Скрыть';
+      }
+    });
+  </script>
+</body>
+</html>

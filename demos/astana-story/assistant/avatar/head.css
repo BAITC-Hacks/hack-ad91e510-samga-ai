@@ -1,0 +1,107 @@
+.assistant-head {
+  --laser-top: -10%;
+  --laser-active: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 46%, rgba(10, 53, 80, .27), transparent 62%);
+}
+
+.assistant-head__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: none;
+  transition: filter .5s ease;
+}
+
+.assistant-head__grid,
+.assistant-head__laser,
+.assistant-head__floor {
+  position: absolute;
+  pointer-events: none;
+}
+
+.assistant-head__grid {
+  inset: 0;
+  opacity: calc(var(--laser-active) * .45);
+  transition: opacity .6s ease;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(140, 230, 255, .16) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgba(140, 230, 255, .10) 0 1px, transparent 1px 18px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0 var(--laser-top), #000 var(--laser-top) 100%);
+  mask-image: linear-gradient(to bottom, transparent 0 var(--laser-top), #000 var(--laser-top) 100%);
+  mix-blend-mode: screen;
+}
+
+.assistant-head__laser {
+  left: -6%;
+  right: -6%;
+  top: var(--laser-top);
+  height: 2px;
+  opacity: var(--laser-active);
+  transition: opacity .25s ease;
+  background: linear-gradient(90deg, transparent, rgba(140, 230, 255, .35) 14%, #fff 50%, rgba(140, 230, 255, .35) 86%, transparent);
+  box-shadow: 0 0 14px 3px rgba(140, 230, 255, .85), 0 0 36px 8px rgba(70, 170, 255, .55), 0 0 78px 18px rgba(40, 120, 220, .3);
+  mix-blend-mode: screen;
+  animation: assistant-laser-flicker 80ms steps(2) infinite;
+}
+
+.assistant-head__laser::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px 4px #fff, 0 0 28px 8px rgba(140, 230, 255, .75);
+  animation: assistant-laser-tip .11s ease-in-out infinite alternate;
+}
+
+.assistant-head__floor {
+  left: 50%;
+  bottom: 4%;
+  width: 4px;
+  height: 4px;
+  border: 1.5px solid rgba(140, 230, 255, .9);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translateX(-50%);
+  box-shadow: 0 0 22px rgba(120, 220, 255, .75), 0 0 44px rgba(70, 170, 255, .5);
+  animation: assistant-floor 1.7s cubic-bezier(.22, 1, .36, 1) 7.9s 1 forwards;
+}
+
+.assistant-head__status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #91ddea;
+  font: 11px/1.4 ui-monospace, SFMono-Regular, monospace;
+  letter-spacing: .12em;
+}
+
+@keyframes assistant-laser-flicker {
+  to { opacity: .84; filter: blur(.6px); }
+}
+
+@keyframes assistant-laser-tip {
+  to { transform: scale(1.35); opacity: .85; }
+}
+
+@keyframes assistant-floor {
+  0% { opacity: 0; width: 4px; height: 4px; }
+  6% { opacity: 1; width: 14px; height: 14px; }
+  100% { opacity: 0; width: 80%; height: 32%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-head__grid,
+  .assistant-head__laser,
+  .assistant-head__floor { display: none; }
+  .assistant-head__canvas { transition: none; }
+}
