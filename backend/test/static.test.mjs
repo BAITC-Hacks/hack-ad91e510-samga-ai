@@ -22,7 +22,6 @@ async function start(t) {
 
 test('city demo and its browser imports are served with browser-safe MIME types',async t=>{
  const get=await start(t);
- const root=await get('/');assert.equal(root.status,302);assert.equal(root.headers.get('location'),'/demos/astana-city/');
  for(const [path,type] of [
   ['/demos/astana-city/','text/html'],['/demos/astana-city/app.mjs','text/javascript'],
   ['/demos/astana-city/style.css','text/css'],['/demos/astana-city/vendor/maplibre-gl.js','text/javascript'],
@@ -36,6 +35,19 @@ test('city demo and its browser imports are served with browser-safe MIME types'
  }
 });
 
+test('new Akim panel is the root entry and serves only its named browser assets',async t=>{
+ const get=await start(t);
+ const root=await get('/');assert.equal(root.status,302);assert.equal(root.headers.get('location'),'/demos/astana-story/');
+ for(const [path,type] of [
+  ['/demos/astana-story/','text/html'],['/demos/astana-story/main.html','text/html'],
+  ['/demos/astana-story/app.mjs','text/javascript'],['/demos/astana-story/assistant/assistant.mjs','text/javascript'],
+  ['/demos/astana-story/assets/akim-civic-hall.png','image/png']
+ ]) {
+  const response=await get(path);assert.equal(response.status,200,path);assert.ok((response.headers.get('content-type')??'').startsWith(type),path);
+ }
+ for(const path of ['/demos/astana-story/task_plan.md','/demos/astana-story/assistant/avatar/ORIGIN.md','/demos/astana-story/assistant/unknown.mjs']) assert.equal((await get(path)).status,404,path);
+});
+
 test('catalog includes the exact baseline without client profile fields',async t=>{
  const get=await start(t);const response=await get('/api/catalog');
  const catalog=JSON.parse(response.body);
@@ -46,7 +58,7 @@ test('catalog includes the exact baseline without client profile fields',async t
 test('entry redirect preserves a plan selected in the briefing',async t=>{
  const get=await start(t),response=await get('/?plan=%5B%5D');
  assert.equal(response.status,302);
- assert.equal(response.headers.get('location'),'/demos/astana-city/?plan=%5B%5D');
+ assert.equal(response.headers.get('location'),'/demos/astana-story/?plan=%5B%5D');
 });
 
 test('health reports configuration state without exposing configuration values',async t=>{
@@ -69,6 +81,9 @@ test('city resolver only permits named public assets',()=>{
   assert.equal(resolveStaticAsset(path),null,path);
  }
  assert.equal(resolveStaticAsset('/demos/astana-city/planner.mjs')?.type,'text/javascript');
+ assert.equal(resolveStaticAsset('/demos/astana-story/assistant/avatar/ORIGIN.md'),null);
+ assert.equal(resolveStaticAsset('/mobile/preview/card.png')?.type,'image/png');
+ assert.equal(resolveStaticAsset('/mobile/preview/../index.html'),null);
 });
 
 test('CLI serves the API from another cwd on an explicit loopback port',async t=>{

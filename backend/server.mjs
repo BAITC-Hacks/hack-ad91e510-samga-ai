@@ -44,7 +44,7 @@ export function createApp(config={}){
    }
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
    const requestUrl=new URL(req.url,'http://localhost'),path=requestUrl.pathname;
-   if(req.method==='GET'&&path==='/'){res.writeHead(302,{Location:'/demos/astana-city/'+requestUrl.search,'Cache-Control':'no-store'});res.end();return;}
+   if(req.method==='GET'&&path==='/'){res.writeHead(302,{Location:'/demos/astana-story/'+requestUrl.search,'Cache-Control':'no-store'});res.end();return;}
    if(req.method==='GET'){
     const asset=await staticResponse(path);
     if(asset){res.writeHead(200,{'Content-Type':asset.type+'; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(asset.body);return;}
