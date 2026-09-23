@@ -54,7 +54,7 @@ function narrative(){
  if(custom){
   const state=inspectDraft(choices),missing=5-choices.length;
   if(!state.canCalculate)return {title:'Свой план · '+choices.length+' из 5 решений',copy:state.errors.length?state.errors.join(' '):'Добавьте ещё '+missing+'. В резерве '+state.remaining+' единиц. Итог будет рассчитан для полного плана.',facts:[{text:'<strong>'+choices.length+' из 5 решений</strong>. Пока показываем исходные показатели районов.'},{text:state.errors.length?state.errors[0]:'Нельзя повторять меры, превышать бюджет или выбирать больше двух из одного направления.',risk:state.errors.length>0}],action:'Добавить решение'};
-  return {title:'Свой план · готов к расчёту',copy:'Пять допустимых решений. Сверьте последствия по всем показателям выбранных районов.',facts:[{text:'Индекс <strong>'+fmt(analysis.result.score)+'</strong>, расходы <strong>'+state.cost+'</strong> из 100.'},{text:'Критических показателей: <strong>'+analysis.result.critical+'</strong>. '+(analysis.result.critical?'Проверьте оставшиеся проблемы и подберите замену.':'Отсутствие критических провалов не означает, что все задачи решены.'),risk:analysis.result.critical>0}],action:analysis.result.critical?'Подобрать улучшение':'Сравнить варианты'};
+  return {title:'Свой план · результат рассчитан',copy:'Пять допустимых решений. Сверьте последствия по всем показателям выбранных районов.',facts:[{text:'Индекс <strong>'+fmt(analysis.result.score)+'</strong>, расходы <strong>'+state.cost+'</strong> из 100.'},{text:'Критических показателей: <strong>'+analysis.result.critical+'</strong>. '+(analysis.result.critical?'Проверьте оставшиеся проблемы и подберите замену.':'Отсутствие критических провалов не означает, что все задачи решены.'),risk:analysis.result.critical>0}],action:analysis.result.critical?'Подобрать улучшение':'Сравнить варианты'};
  }
  if(stage===0)return {title:'Исходная ситуация',copy:'Нура: школы '+exact(value(baseline,'Нура','S1'))+', медицина '+exact(value(baseline,'Нура','S2'))+'. Бюджет — 100 единиц, решений должно быть пять.',facts:[{text:'<strong>Школы и медицина Нуры</strong> находятся ниже критической отметки 40.',risk:true},{text:'Сравним, как разные планы изменят город при одном и том же бюджете.'}],action:'Показать неудачный план'};
  if(stage===1)return {title:'Неудачный приоритет',copy:'Все районные проекты направлены в Есиль. Потрачено 95, две критические проблемы Нуры остались.',facts:[{text:'У Нуры по-прежнему <strong>'+exact(value(weak,'Нура','S1'))+'</strong> по школам и <strong>'+exact(value(weak,'Нура','S2'))+'</strong> по медицине.',risk:true},{text:'Те же меры можно перенести в слабые районы, сохранив расходы <strong>'+weak.cost+'</strong>.'}],action:'Перераспределить помощь'};
@@ -76,7 +76,7 @@ function renderControls(){
 function renderMetrics(){
  const data=current(),state=inspectDraft(choices),pending=hasPlan()&&!analysis?.ok;
  $('budget-used').textContent=state.cost;$('budget-free').textContent=state.remaining+' в резерве';$('budget-fill').style.width=Math.min(100,state.cost)+'%';
- $('budget-status').textContent=hasPlan()?'План':'Доступно';
+ $('budget-status').textContent='Потрачено';
  $('decision-count').textContent=choices.length+' из 5 решений'+(choices.length?' · направлений: '+Object.keys(state.directions).length:'');
  const scoreData=pending?null:data;
  $('score-value').textContent=scoreData?fmt(scoreData.score):'—';$('score-base').textContent=fmt(baseline.score);
