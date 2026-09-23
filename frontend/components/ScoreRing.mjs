@@ -1,0 +1,2 @@
+import { clamp, fmt } from '../lib/format.mjs';
+export const ScoreRing = (score, { label = 'из 100', from = score, large = false } = {}) => `<div class="score-ring ${large ? 'large' : ''}" role="img" aria-label="Качество жизни: ${fmt(score)} из 100"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="85"/><circle class="ring-value" cx="100" cy="100" r="85" pathLength="100" stroke-dasharray="${clamp(score)} 100"/></svg><div><strong data-count="${score}" data-from="${from}">${fmt(from)}</strong><span>${label}</span></div></div>`;

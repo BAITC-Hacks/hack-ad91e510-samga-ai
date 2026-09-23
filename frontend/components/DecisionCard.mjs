@@ -1,0 +1,9 @@
+import { Icon } from './Icon.mjs';
+import { esc, groupLabels, groupIcons } from '../lib/format.mjs';
+import { selectionReason } from '../lib/scenario.mjs';
+export function DecisionCard(measure, state) {
+  const choice = state.choices.find(c => c.id === measure.id);
+  const reason = selectionReason(state.choices, measure, state.data.measures);
+  const effectNames = Object.fromEntries(state.data.indicators.map(i => [i.id,i.name]));
+  return `<article class="decision-card ${choice ? 'selected' : ''}" data-group="${measure.group}" data-measure="${measure.id}"><div class="decision-top"><span class="category-icon">${Icon(groupIcons[measure.group])}</span><span class="decision-category">${groupLabels[measure.group]}</span><span class="decision-cost">${measure.cost}<small> ед.</small></span></div><h2>${esc(measure.name)}</h2><div class="decision-scope">${Icon(measure.type === 'city' ? 'city' : 'pin')} ${choice?.district ? esc(choice.district) : measure.type === 'city' ? 'Весь город' : 'Район на выбор'}<span class="scope-separator">·</span>${measure.type === 'city' ? 'Городская мера' : 'Районная мера'}</div><div class="decision-effects">${Object.entries(measure.effects).map(([id,value]) => `<span class="effect ${value < 0 ? 'negative' : ''}"><b>${value > 0 ? '+' : '−'}${Math.abs(value)}</b>${esc(effectNames[id])}</span>`).join('')}</div><div class="decision-bottom"><span class="lag-note">${Icon('clock')} Эффект через ${measure.lag} кв.</span><button class="select-button ${choice ? 'is-selected' : ''}" data-action="${choice ? 'remove' : 'pick'}" data-id="${measure.id}" data-focus="measure-${measure.id}" ${state.busy || (!choice && reason) ? 'disabled' : ''} aria-label="${choice ? 'Убрать' : 'Выбрать'}: ${esc(measure.name)}">${Icon(choice ? 'check' : 'plus')}${choice ? 'Добавлено' : 'Выбрать'}</button></div>${!choice && reason ? `<p class="selection-reason">${esc(reason)}</p>` : ''}</article>`;
+}
