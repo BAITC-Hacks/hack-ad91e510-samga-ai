@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { buildContext, InputError, trustedPrompt } from './context.mjs';
 import { ProviderError, streamOpenAI, speech, transcribe } from './providers.mjs';
 
-const origins = new Set(['http://127.0.0.1:8095', 'http://localhost:8095', 'http://127.0.0.1:4198', 'http://localhost:4198']);
+const origins = new Set(['http://127.0.0.1:8095', 'http://localhost:8095', 'http://127.0.0.1:4196', 'http://localhost:4196', 'http://127.0.0.1:4198', 'http://localhost:4198']);
 const audioTypes = new Set(['audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/ogg']);
 const validModel = value => typeof value === 'string' && /^[a-zA-Z0-9._-]{2,80}$/.test(value);
 const validVoice = value => typeof value === 'string' && (value === '' || /^[a-zA-Z0-9_-]{8,100}$/.test(value));

@@ -19,6 +19,14 @@ test('config accepts trusted origin but never echoes keys', async () => withServ
   assert.equal(blocked.status, 403);
 }));
 
+test('documented site port 4196 can reach assistant status', async () => withServer(async base => {
+  for (const origin of ['http://127.0.0.1:4196', 'http://localhost:4196']) {
+    const response = await fetch(base + '/api/assistant/status', { headers: { Origin: origin } });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('access-control-allow-origin'), origin);
+  }
+}));
+
 test('chat rejects missing model access rather than producing fake text', async () => withServer(async base => {
   const response = await fetch(base + '/api/assistant/chat', { method: 'POST', headers: { Origin: 'http://localhost:8095', 'Content-Type': 'application/json' }, body: JSON.stringify({ message: 'Что с Нурой?', choices: [] }) });
   assert.equal(response.status, 503);
