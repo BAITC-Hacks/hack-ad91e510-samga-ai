@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ASTANA / Город возможностей</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./simulator.css">
+  <script src="./vendor/maplibre-gl.js" defer></script><script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <div id="map" aria-label="Интерактивная трёхмерная карта Астаны"></div>
+  <div class="vignette"></div>
+  <header>
+    <a class="brand" href="./" aria-label="Астана — начало"><span class="brand-icon">A<span>•</span></span><span>ASTANA<span class="brand-sub">CITY LAB / SAMGA AI</span></span></a>
+    <div class="header-divider"></div><span class="project-title">Аким на 5 часов</span>
+    <span class="demo-tag"><i></i> Учебный симулятор</span>
+    <button id="insights" class="header-button">Анализ</button><button id="strategy" class="header-button">Найти план</button><button id="compare" class="header-button">Сравнить</button><button id="overview" class="header-button">Обзор города <span>↗</span></button>
+  </header>
+  <main>
+    <section class="intro"><div class="eyebrow">АКИМ НА 5 ЧАСОВ · ШАГ 1 ИЗ 2</div><h1>На что потратим<br><span>100 единиц?</span></h1><p>Перед вами стартовый план. Замените любой проект или сразу посмотрите его последствия.</p><button id="start-planning" class="start-planning">1 · Изменить решения <span>↘</span></button><small class="start-hint">Пять карточек проектов — внизу экрана</small></section>
+    <nav class="layer-bar" aria-label="Слои карты">
+      <button class="layer active" data-layer="city" aria-pressed="true"><span>▥</span>Город</button>
+      <button class="layer" data-layer="districts" aria-pressed="false"><span>◈</span>Районы</button>
+      <button class="layer" data-layer="green" aria-pressed="false"><span>♧</span>Парки</button>
+    </nav>
+    <div class="map-legend"><i style="background:#ddaf79"></i> &lt; 50 <i style="background:#76b6ae"></i> 50–60 <i style="background:#c7e78b"></i> ≥ 60 <i style="background:#74838e"></i> нет данных · индекс района</div><div class="map-caption"><span class="crosshair">+</span><span>АСТАНА, КАЗАХСТАН<small id="coords">51.1282° N &nbsp; 71.4304° E</small></span></div>
+    <aside class="panel">
+      <div class="panel-top"><span class="eyebrow">ПУЛЬС ГОРОДА</span><span class="pill">Модель</span></div>
+      <div class="score-line"><strong id="city-score">—</strong><div><span class="score-outof">/ 100</span><span id="score-delta">Исходное состояние</span></div></div>
+      <p class="score-label">Индекс качества жизни</p>
+      <div id="outcome-note" class="outcome-note"></div><div class="score-track"><span id="score-track"></span></div>
+      <div class="state-switch" aria-label="Состояние города"><button id="before" class="active" aria-pressed="true">Сейчас</button><button id="after" aria-pressed="false">Через 2 года <span>↗</span></button></div>
+      <div class="section-label"><span>РАЙОНЫ</span><span>ИНДЕКС</span></div>
+      <div id="districts"></div>
+      <button id="all-metrics" class="details-button">Все 10 показателей ↗</button><div class="district-detail"><div class="detail-heading"><span id="district-name">Есиль</span><span id="district-change">Выбранный район</span></div><p id="district-profile"></p><div id="metrics"></div></div>
+      <div class="panel-foot"><span class="dot"></span> Учебная модель · не городская статистика</div>
+    </aside>
+    <div class="view-tools"><button id="tilt" aria-pressed="true" title="Переключить плоскую и объёмную карту">3D</button><button id="home" aria-label="Вернуться к Байтереку" title="К центру города">⌖</button><button id="zoom-in" aria-label="Приблизить">+</button><button id="zoom-out" aria-label="Отдалить">−</button></div>
+    <div class="map-status" id="map-status" role="status">Загружаем городскую геометрию…</div>
+    <section class="scenario">
+      <div class="scenario-lead"><span class="eyebrow">ШАГ 1 · ВЫБЕРИТЕ РЕШЕНИЯ</span><h2>Стартовый план · 5 из 5</h2><p>Нажмите карточку, чтобы заменить проект или район</p><button id="load-source" class="example-button">Пример из задания ↗</button></div>
+      <div class="decisions" id="decisions"></div>
+      <div class="budget"><span>ОСТАЛОСЬ ИЗ 100 ЕД.</span><strong id="budget-left">15</strong><span class="budget-spent">Потрачено <b id="budget">85</b> ед.</span><div class="budget-track"><i></i></div><span id="budget-rest"></span></div>
+      <button id="apply" class="apply">2 · Показать город через 2 года <span>↗</span></button>
+    </section>
+  </main>
+  <footer><span>География OpenStreetMap · высоты могут быть оценочными</span><span>Вращение: правая кнопка мыши · масштаб: колесо</span></footer>
+  <div id="announcement" class="announcement" role="status" aria-live="polite"></div><dialog id="workspace" aria-labelledby="workspace-title"><div class="workspace-head"><div><span class="eyebrow">ASTANA / CITY LAB</span><h2 id="workspace-title"></h2></div><button id="close-workspace" class="close-button" aria-label="Закрыть">×</button></div><div id="workspace-body"></div></dialog><noscript>Для интерактивной карты включите JavaScript.</noscript>
+</body>
+</html>
