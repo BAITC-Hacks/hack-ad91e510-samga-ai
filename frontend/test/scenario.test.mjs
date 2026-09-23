@@ -24,7 +24,7 @@ test('draft recovery rejects unknown measures, invalid districts and duplicates'
   assert.deepEqual(restoreChoices(JSON.stringify([{id:'M1',district:'unknown'},{id:'M2',district:'Есиль'},{id:'M2'},{id:'unknown'},null]),data),[{id:'M2'}]);
 });
 test('server demo uses the existing model and rejects partial results', () => {
-  assert.equal(demoResponse('/api/me').data.baseline.score,52.55768);
+  assert.ok(Math.abs(demoResponse('/api/me').data.baseline.score-52.55768)<1e-9);
   assert.equal(demoResponse('/api/evaluate',{choices:[]}).status,422);
   const choices = [{id:'M7',district:'Нура'},{id:'M8',district:'Нура'},{id:'M10',district:'Нура'},{id:'M12'},{id:'M5',district:'Сарыарка'}];
   const response = demoResponse('/api/evaluate',{choices});
