@@ -15,7 +15,7 @@ try {
   browser=await chromium.launch({headless:true,...(chrome?{executablePath:chrome}:{})});
   const page=await browser.newPage({viewport:{width:1600,height:1080},reducedMotion:'reduce'});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(origin);
+  await page.goto(`${origin}/?map=2d`);
   await page.waitForSelector('#city-map');
   assert.equal(await page.locator('.district-terrain').count(),5);
   assert.match(await page.locator('.qol-instrument .score-ring').innerText(),/52,56/);

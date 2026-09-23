@@ -4,6 +4,7 @@ import { Icon } from './components/Icon.mjs';
 import { Dashboard } from './screens/Dashboard.mjs';
 import { DEFAULT_CAMERA } from './components/CityMap.mjs';
 import { bindMapInteraction, zoomCamera } from './lib/map-interaction.mjs';
+import { preserveScene,mountScene,sceneZoom,sceneTilt } from './lib/scene-controller.mjs';
 import { groupLabels } from './lib/format.mjs';
 import { Decisions } from './screens/Decisions.mjs';
 import { Districts } from './screens/Districts.mjs';
@@ -16,19 +17,37 @@ import { esc } from './lib/format.mjs';
 import { animateNumbers, haptic } from './lib/motion.mjs';
 
 const app = document.querySelector('#app');
-export const state = { data:null, choices:[], view:'home', group:'all', district:'Нура', result:null, analysis:null, busy:false, analysisBusy:false, analysisError:'', animateResult:false, mapLayer:'all', mapStage:'before', mapIssue:null, showAllIssues:false, mapCamera:[...DEFAULT_CAMERA] };
+export const state = { data:null, choices:[], view:'home', group:'all', district:'Нура', result:null, analysis:null, busy:false, analysisBusy:false, analysisError:'', animateResult:false, mapLayer:'all', mapStage:'before', mapIssue:null, showAllIssues:false, mapCamera:[...DEFAULT_CAMERA], mapMode:new URLSearchParams(location.search).get('map')==='2d'?'2d':'3d', mapFocus:null,mapPose:null,sceneCameraVersion:0,showBuildings:true };
 const screens = { home:Dashboard, decisions:Decisions, districts:Districts, result:Result };
 const sheet = document.querySelector('#sheet');
 let scenarioRevision = 0;
 export function render() {
   const focused = document.activeElement?.dataset.focus;
+  const canvasFocused=document.activeElement?.classList.contains('city-webgl-canvas');
   const view = screens[state.view] ?? Dashboard;
-  app.innerHTML = ControlShell(view(state),state);
+  const preserved=preserveScene(state);
+  const markup=ControlShell(view(state),state);
+  const fullscreen=document.fullscreenElement;
+  if(fullscreen?.matches('.city-map-panel')&&state.view==='home'){
+    const template=document.createElement('template');template.innerHTML=markup;
+    fullscreen.innerHTML=template.content.querySelector('.city-map-panel').innerHTML;
+  }else app.innerHTML=markup;
   animateNumbers(app);
   bindMapInteraction(state);
+  mountScene(state,{onDistrict:selectMapDistrict,onOverview:resetMap,onFallback:()=>{state.mapMode='2d';render();toast('3D недоступен в этом браузере. Включена 2D-карта; выбор районов и решений работает.');}},preserved);
   if (state.view === 'result' && state.result) state.animateResult = false;
   if (focused) app.querySelector(`[data-focus="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
+  if(canvasFocused)app.querySelector('.city-webgl-canvas')?.focus({preventScroll:true});
+  app.querySelector('[data-action="scene-fullscreen"]')?.setAttribute('aria-label',document.fullscreenElement?'Свернуть карту':'Развернуть карту');
 }
+function selectMapDistrict(district){
+  if(!state.data.districts.some(d=>d.name===district))return;
+  state.district=district;state.mapIssue=null;state.showAllIssues=false;
+  if(state.mapMode==='3d'){state.mapFocus=district;state.mapPose=null;state.sceneCameraVersion++;}
+  render();
+  if(state.mapMode==='2d'&&matchMedia('(max-width: 900px)').matches)document.querySelector('#district-inspector')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+}
+function resetMap(){state.mapFocus=null;state.mapPose=null;state.sceneCameraVersion++;state.mapCamera=[...DEFAULT_CAMERA];render();}
 function navigate() {
   const next = location.hash.slice(1);
   state.view = tabs.some(([key]) => key === next) ? next : 'home';
@@ -92,16 +111,26 @@ document.addEventListener('click', event => {
   if (action === 'retry-boot') boot();
   if (!state.data) return;
   if (action === 'map-district' && state.data.districts.some(d=>d.name===district)) {
-    state.district=district;state.mapIssue=null;state.showAllIssues=false;render();
-    if(matchMedia('(max-width: 900px)').matches) document.querySelector('#district-inspector')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+    selectMapDistrict(district);
+  }
+  if(action==='map-mode'&&['2d','3d'].includes(button.dataset.mode)){state.mapMode=button.dataset.mode;render();}
+  if(action==='scene-overview')resetMap();
+  if(action==='scene-buildings'){state.showBuildings=!state.showBuildings;render();}
+  if(action==='scene-tilt')sceneTilt();
+  if(action==='scene-inspector')document.querySelector('#district-inspector')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+  if(action==='scene-fullscreen'){
+    const panel=document.querySelector('.city-map-panel');
+    const operation=document.fullscreenElement?document.exitFullscreen():panel?.requestFullscreen?.();
+    if(operation)operation.catch(()=>toast('Полноэкранный режим недоступен в этом браузере.'));
+    else toast('Полноэкранный режим недоступен в этом браузере.');
   }
   if (action === 'map-layer' && (button.dataset.layer==='all' || groupLabels[button.dataset.layer])) {state.mapLayer=button.dataset.layer;state.mapIssue=null;state.showAllIssues=false;render();}
   if (action === 'map-issue' && state.data.indicators.some(i=>i.id===button.dataset.issue)) {state.mapIssue=button.dataset.issue;render();}
   if (action === 'toggle-issues') {state.showAllIssues=!state.showAllIssues;render();}
   if (action === 'map-pick') addChoice(id,state.district);
   if (action === 'map-stage' && ['before','after'].includes(button.dataset.stage) && (button.dataset.stage==='before'||state.result)) {state.mapStage=button.dataset.stage;render();}
-  if (action === 'map-zoom') {state.mapCamera=zoomCamera(state.mapCamera,button.dataset.direction==='in'?.8:1.25);render();}
-  if (action === 'map-reset') {state.mapCamera=[...DEFAULT_CAMERA];render();}
+  if (action === 'map-zoom') {const factor=button.dataset.direction==='in'?.8:1.25;if(state.mapMode==='3d')sceneZoom(factor);else{state.mapCamera=zoomCamera(state.mapCamera,factor);render();}}
+  if (action === 'map-reset')resetMap();
   if (action === 'filter') { state.group = group; render(); }
   if (action === 'district' && state.data.districts.some(d => d.name === district)) {
     state.district = district; render();
@@ -125,6 +154,10 @@ document.addEventListener('keydown',event=>{
 });
 sheet.addEventListener('click', event => { if (event.target === sheet) { const rect = sheet.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) sheet.close(); } });
 window.addEventListener('hashchange', navigate);
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement&&state.data)render();
+  else document.querySelector('[data-action="scene-fullscreen"]')?.setAttribute('aria-label','Свернуть карту');
+});
 async function boot() {
   try { state.data = await cityService.bootstrap(); try { state.choices = restoreChoices(localStorage.getItem(STORAGE_KEY),state.data); } catch { state.choices = []; } navigate(); }
   catch (error) { app.innerHTML = `<div class="boot error-state">${Icon('city')}<h1>Город скоро будет на связи</h1><p>${esc(error.message)}</p><button class="button primary" data-action="retry-boot">Попробовать снова ${Icon('reset')}</button></div>`; }

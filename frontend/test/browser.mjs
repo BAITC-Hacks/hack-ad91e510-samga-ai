@@ -23,7 +23,7 @@ try {
     await page.locator(`${nav}[href="#${name}"]`).click();
     await page.waitForSelector(`${nav}[href="#${name}"][aria-current="page"]`);
   };
-  await page.goto(origin);
+  await page.goto(`${origin}/?map=2d`);
   await page.waitForSelector('#city-map');
   assert.match(await page.locator('.score-ring').innerText(),/52,56/);
   await page.screenshot({path:`${output}/home-desktop.png`,fullPage:true});

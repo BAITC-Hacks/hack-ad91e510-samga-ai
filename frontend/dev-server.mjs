@@ -6,7 +6,7 @@ import { measures, indicators, districts } from '../docs/brief-analysis/dist/dat
 import { demoResponse } from './services/demo-api.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const mime = { '.html':'text/html; charset=utf-8', '.mjs':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml' };
+const mime = { '.html':'text/html; charset=utf-8', '.mjs':'text/javascript; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.json':'application/json; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml' };
 export function createFrontendServer({ apiOrigin = process.env.SAMGA_API_ORIGIN } = {}) {
   if (apiOrigin && !/^https?:$/.test(new URL(apiOrigin).protocol)) throw new Error('SAMGA_API_ORIGIN must be an HTTP(S) URL.');
   return createServer(async (req, res) => {
@@ -37,7 +37,7 @@ export function createFrontendServer({ apiOrigin = process.env.SAMGA_API_ORIGIN 
       if (path === '/catalog.json') return json(200, { measures, indicators, districts });
       const relative = decodeURIComponent(path === '/' ? '/index.html' : path);
       const target = resolve(root, `.${relative}`);
-      const allowed = ['index.html','app.mjs','styles.css','control.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs';
+      const allowed = ['index.html','app.mjs','styles.css','control.css','scene.css','favicon.svg'].includes(relative.slice(1)) || /^\/(components|screens|lib)\/[A-Za-z-]+\.mjs$/.test(relative) || relative === '/services/api.mjs' || relative === '/data/astana-buildings.json' || ['/vendor/three/three.module.min.js','/vendor/three/three.core.min.js','/vendor/three/OrbitControls.js'].includes(relative);
       if (!target.startsWith(root + sep) || !allowed || !mime[extname(target)]) return json(404, { error: 'Страница не найдена.' });
       const data = await readFile(target);
       res.writeHead(200, { 'Content-Type':mime[extname(target)] }); res.end(req.method === 'HEAD' ? undefined : data);
