@@ -10,15 +10,20 @@
 
 ## Получить и увидеть результат
 
+**Без Git:** [скачать готовый ZIP](https://github.com/BAITC-Hacks/hack-ad91e510-samga-ai/releases/download/astana-city-demo-v1/astana-city-demo.zip)
+и следовать [START-HERE.md](START-HERE.md). Для быстрого просмотра достаточно
+открыть `demos/astana-city/preview.png`. ZIP содержит код и запускается локально.
+Скачать его могут участники с доступом к приватному репозиторию.
+
 Если репозитория ещё нет:
 
 ```sh
 git clone --branch demo/astana-city-base https://github.com/BAITC-Hacks/hack-ad91e510-samga-ai.git
 cd hack-ad91e510-samga-ai
-python3 -m http.server 4195 --bind 127.0.0.1
+python3 start-demo.py
 ```
 
-Открыть http://127.0.0.1:4195/demos/astana-city/.
+Браузер откроется автоматически; адрес со свободным портом появится в терминале.
 На Windows вместо `python3` можно использовать `py`.
 Репозиторий приватный: нужен GitHub-аккаунт с доступом команды. Сервер запускается
 из корня репозитория. Нужен интернет для карты; ключи и зависимости ставить не нужно.

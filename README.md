@@ -13,6 +13,14 @@
 
 ## Запуск выбранного макета
 
+**Для команды без Git:** [скачать ZIP](https://github.com/BAITC-Hacks/hack-ad91e510-samga-ai/releases/download/astana-city-demo-v1/astana-city-demo.zip),
+распаковать и открыть `START-WINDOWS.bat` или `START-MAC.command`.
+Нужен Python 3. Подробно — [START-HERE.md](START-HERE.md).
+Изображение ниже можно посмотреть без запуска.
+
+При работе из клонированного репозитория можно выполнить `python3 start-demo.py`:
+свободный порт выбирается автоматически, браузер открывается сам.
+
 Из корня клонированного репозитория, с Python 3:
 
 ```sh
