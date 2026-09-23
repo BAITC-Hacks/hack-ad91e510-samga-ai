@@ -7,3 +7,8 @@ __pycache__/
 !.env.example
 !.env.sample
 *.log
+mobile/**/build/
+mobile/**/.build/
+mobile/**/Delivery/
+mobile/**/xcuserdata/
+mobile/**/*.xcuserstate

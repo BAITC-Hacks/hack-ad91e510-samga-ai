@@ -1,0 +1,32 @@
+{
+  "package": "three",
+  "version": "0.186.0",
+  "license": "MIT",
+  "modifications": "OrbitControls bare import replaced with a local relative import; renderer core import points to the minified local core.",
+  "files": [
+    {
+      "file": "three.module.min.js",
+      "source": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js",
+      "sha256": "f815490fbe3cd5f90147fcbdac6674dc9a0b930379b9bc46230aa0133cd8ce0e",
+      "bytes": 392839
+    },
+    {
+      "file": "three.core.min.js",
+      "source": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.core.min.js",
+      "sha256": "f3556fb8c9aff8fc6f8e090b918ae5d4e6b45152afb93815002d3319d875cdec",
+      "bytes": 415816
+    },
+    {
+      "file": "OrbitControls.js",
+      "source": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/controls/OrbitControls.js",
+      "sha256": "68904948ec52ce575e4a4cb83303d12bb68e7f691e7b679a822c8eb7b20f4288",
+      "bytes": 40771
+    },
+    {
+      "file": "LICENSE",
+      "source": "https://cdn.jsdelivr.net/npm/three@0.186.0/LICENSE",
+      "sha256": "8b378ebe60e2fe500158cb0ac71cb5e8b7d92953c2abcc63a0eb90499653b5bc",
+      "bytes": 1081
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+import { geography } from '../lib/astana-geography.mjs';
+import { activeSnapshot, districtIssues } from '../lib/district-insights.mjs';
+import { esc, fmt } from '../lib/format.mjs';
+import { Icon } from './Icon.mjs';
+import { SceneToolbar } from './SceneToolbar.mjs';
+
+export const DEFAULT_CAMERA = [75,100,960,730];
+function CityMap2D(state) {
+  const snapshot = activeSnapshot(state);
+  const roads = ['trunk','primary','secondary','tertiary'].map(kind=>`<path class="map-road ${kind}" d="${geography.roads.filter(r=>r.kind===kind).map(r=>r.path).join('')}"/>`).join('');
+  const regions = geography.districts.map(shape=>{
+    const district=snapshot.districts.find(d=>d.name===shape.name);
+    const issues=districtIssues(district,state.data.indicators,state.mapLayer).filter(i=>i.value<60);
+    const selected=state.district===shape.name;
+    const planned=state.choices.filter(c=>c.district===shape.name).length;
+    return {shape,district,issues,selected,planned};
+  });
+  return `<div class="map-viewport"><div class="map-coordinate">ASTANA <span>GEO / 01</span></div><div class="map-north"><span>N</span><svg viewBox="0 0 20 30" aria-hidden="true"><path d="m10 2 6 20-6-5-6 5Z"/></svg></div><svg id="city-map" class="city-map" viewBox="${(state.mapCamera ?? DEFAULT_CAMERA).join(' ')}" aria-labelledby="map-title map-description"><title id="map-title">Интерактивная карта районов Астаны</title><desc id="map-description">Реальная геометрия OpenStreetMap. Выберите район, чтобы увидеть условные проблемы модели и добавить мероприятия в план. Карту можно перемещать и масштабировать.</desc><defs><pattern id="coordinate-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#315669" stroke-width=".5" opacity=".32"/></pattern><clipPath id="city-outline"><path d="${geography.districts.map(d=>d.path).join('')}"/></clipPath><linearGradient id="terrain-wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#28515a"/><stop offset="1" stop-color="#112c3b"/></linearGradient></defs><g class="map-surface"><rect x="-900" y="-700" width="2800" height="2200" fill="url(#coordinate-grid)"/><g class="map-orbits"><ellipse cx="540" cy="520" rx="493" ry="288"/><ellipse cx="540" cy="520" rx="516" ry="302"/><ellipse cx="540" cy="520" rx="534" ry="314" stroke-dasharray="2 14"/></g><g class="map-terrain-depth" transform="translate(0 17)">${regions.map(({shape})=>`<path d="${shape.path}"/>`).join('')}</g><g class="map-terrain">${regions.map(({shape,selected,issues})=>`<path class="district-terrain ${selected ? 'selected' : ''} ${issues.some(i=>i.severity==='critical') ? 'has-critical' : ''}" d="${shape.path}" data-action="map-district" data-district="${esc(shape.name)}" role="button" tabindex="0" aria-label="Район ${esc(shape.name)}: ${issues.length} показателей требуют внимания" aria-pressed="${selected}"/>`).join('')}</g><g clip-path="url(#city-outline)" class="map-features"><path class="map-parks" d="${geography.parks.join('')}"/>${roads}${geography.water.map(w=>`<path class="map-water ${w.kind}" d="${w.path}"/>`).join('')}</g><g class="map-boundaries" pointer-events="none">${regions.map(({shape,selected})=>`<path class="${selected ? 'selected' : ''}" d="${shape.path}"/>`).join('')}</g><g class="map-labels">${regions.map(({shape,district,issues,selected,planned})=>{
+    const [x,y]=shape.anchor;
+    return `<g class="map-district-label ${selected ? 'selected' : ''}" transform="translate(${x} ${y})" data-action="map-district" data-district="${esc(shape.name)}" role="button" tabindex="0" aria-label="Выбрать район ${esc(shape.name)}" aria-pressed="${selected}"><circle class="marker-halo" r="22"/><circle class="marker-ring" r="12"/><circle class="marker-core ${issues.some(i=>i.severity==='critical') ? 'critical' : issues.length ? 'attention' : 'stable'}" r="5"/><path class="marker-stem" d="M0 15v18"/><rect class="map-label-background" x="-77" y="33" width="154" height="65" rx="9"/><text class="map-district-name" y="58" text-anchor="middle">${esc(shape.name)}</text><text class="map-district-value" y="81" x="-49">${fmt(district.score,1)}</text><text class="map-district-issues" y="81" x="54" text-anchor="end">${issues.length} зон${planned ? ` · ${planned} в плане` : ''}</text>${planned ? `<g transform="translate(64 32)"><circle r="12" class="map-plan-marker"/><text y="4" text-anchor="middle" class="map-plan-count">${planned}</text></g>` : ''}</g>`;
+  }).join('')}</g></g></svg><div class="map-controls" role="group" aria-label="Управление картой"><button data-action="map-zoom" data-direction="in" aria-label="Приблизить карту">${Icon('plus')}</button><button data-action="map-zoom" data-direction="out" aria-label="Отдалить карту">${Icon('minus')}</button><button data-action="map-reset" aria-label="Показать весь город">${Icon('target')}</button></div><div class="map-legend"><span><i class="critical"></i>Ниже 40</span><span><i class="attention"></i>40–59</span><span><i class="planned"></i>Мера в плане</span></div><div class="map-source"><a href="${geography.attributionUrl}" target="_blank" rel="noopener">© OpenStreetMap</a><span>Контуры: 31.05.2026 · Объёмная проекция</span></div></div>`;
+}
+export function CityMap(state){
+  const is3D=state.mapMode==='3d';
+  const host=is3D?`<div id="city-3d-host" class="city-3d-host"></div><div class="scene-hud"><span class="scene-live-badge">3D EXPLORER</span><span data-scene-detail>Готовим сцену…</span></div><div class="scene-gesture-hint">Тяните для вращения · Колесо — масштаб<br><span>Нажмите на район, затем на здание</span></div>`:'';
+  const markup=CityMap2D(state).replace('<div class="map-viewport">',`<div class="map-viewport ${is3D?'mode-3d':''}">${host}`);
+  return SceneToolbar(state)+markup;
+}

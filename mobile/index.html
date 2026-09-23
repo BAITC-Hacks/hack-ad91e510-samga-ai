@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>АКИМ / SAMGA AI — мобильные демо</title>
+  <style>
+    :root{color-scheme:light;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f6f7;color:#102b38}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1120px;margin:auto;padding:48px 24px 72px}header{max-width:760px;margin-bottom:32px}.eyebrow{color:#0b6576;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:12px}h1{font-size:clamp(34px,5vw,58px);line-height:1.02;margin:12px 0 16px}p{line-height:1.55;color:#405762}.notice{border-left:4px solid #0b6576;background:#e3f0f2;padding:14px 16px;border-radius:8px}.roles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.role{background:#fff;border:1px solid #d8e2e5;border-radius:20px;padding:24px;box-shadow:0 12px 28px #163c4912}.tag{display:inline-block;padding:5px 9px;border-radius:99px;background:#e3f0f2;color:#07586a;font-size:13px;font-weight:700}h2{margin:13px 0 8px;font-size:27px}ol{padding-left:21px;line-height:1.55;color:#294752}.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.shots figure{margin:0;background:#f3f6f7;border-radius:14px;overflow:hidden}.shots img{width:100%;display:block;max-height:530px;object-fit:cover;object-position:top}.shots figcaption{padding:10px 12px;font-size:13px;line-height:1.35;color:#405762}footer{margin-top:30px;padding-top:20px;border-top:1px solid #d8e2e5;color:#405762}a{color:#07586a}@media(max-width:760px){.wrap{padding:28px 16px 48px}.roles{grid-template-columns:1fr}.shots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="eyebrow">Локальные iOS-демо</div>
+      <h1>АКИМ / SAMGA AI<br>две мобильные роли</h1>
+      <p>Аким видит события и готовит учебное поручение. Житель создаёт локальное обращение и проходит его демонстрационный путь.</p>
+      <p class="notice"><strong>Граница:</strong> это отдельные iOS-приложения. Синхронизации с веб-панелью, друг с другом и городскими службами нет.</p>
+    </header>
+    <section class="roles" aria-label="Роли">
+      <article class="role">
+        <span class="tag">Роль 1</span><h2>Аким</h2>
+        <p>Наблюдает за городскими событиями, картой и рабочими чатами. Контроль и черновики остаются внутри демонстрационной сессии.</p>
+        <ol><li>Нажать <strong>«Открыть демоверсию»</strong>.</li><li>Во вкладке <strong>«События»</strong> открыть карточку и выбрать <strong>«Взять на контроль»</strong>.</li><li>Во вкладке <strong>«Помощник»</strong> открыть <strong>«Проект поручения»</strong> и нажать <strong>«Сохранить черновик»</strong>.</li></ol>
+        <div class="shots"><figure><img src="preview/login-light.png" alt="Вход в АКИМ для iPhone"><figcaption>Подтверждённый вход: есть отдельный переход в демоверсию.</figcaption></figure><figure><img src="preview/demo-feed.png" alt="Лента событий АКИМ"><figcaption>Подтверждённая лента с утренней сводкой, фильтрами и вкладками.</figcaption></figure></div>
+      </article>
+      <article class="role">
+        <span class="tag">Роль 2</span><h2>Житель</h2>
+        <p>Фиксирует проблему фото, голосом или текстом, сам проверяет адрес и сохраняет обращение только на устройстве.</p>
+        <ol><li><strong>Фото</strong> → <strong>«Посмотреть пример»</strong> → <strong>«Продолжить»</strong>.</li><li>Проверить учебный адрес и выбрать <strong>«Отправить в демо»</strong>.</li><li>Открыть обращение №104: его статус <strong>«Получено»</strong>. Следующие статусы включаются только кнопкой <strong>«Демо: показать следующий этап»</strong>.</li></ol>
+        <div class="shots"><figure><img src="preview/report-saved.png" alt="Сохранённое демо-обращение номер 104"><figcaption>Подтверждено: обращение №104 сохранено локально; городским службам ничего не отправлено.</figcaption></figure><figure><img src="preview/report-detail.png" alt="Карточка обращения со статусом Получено"><figcaption>Подтверждено: карточка №104 открывается со статусом «Получено».</figcaption></figure></div>
+      </article>
+    </section>
+    <footer>Исходники и инструкция запуска: <a href="README.md">mobile/README.md</a>. Скриншоты взяты из подтверждённых Preview обеих iOS-версий; сгенерированных или имитированных экранов здесь нет.</footer>
+  </main>
+</body>
+</html>

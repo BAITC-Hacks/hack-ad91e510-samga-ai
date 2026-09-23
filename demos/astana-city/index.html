@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SAMGA AI / Аким на 5 часов</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./vendor/maplibre-gl.css"><link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./planner.css">
+  <script src="./vendor/maplibre-gl.js" defer></script><script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <div id="map" aria-label="Интерактивная трёхмерная карта Астаны"></div>
+  <div class="vignette"></div>
+  <header>
+    <a class="brand" href="./" aria-label="Астана — начало"><span class="brand-icon">A<span>•</span></span><span>ASTANA<span class="brand-sub">CITY LAB / SAMGA AI</span></span></a>
+    <div class="header-divider"></div><span class="project-title">Аким на 5 часов</span>
+    <span class="demo-tag" id="connection-status"><i></i> Подключаем расчёт…</span>
+    <button id="overview" class="header-button">Обзор города <span>↗</span></button>
+  </header>
+  <main>
+    <section class="intro"><div class="eyebrow">ГОРОД, КОТОРЫЙ МЕНЯЕТЕ ВЫ</div><h1>Будущее Астаны.<br><span>В ваших решениях.</span></h1><p>Пять решений. Один город. Видимый результат.</p></section>
+    <nav class="layer-bar" aria-label="Слои карты">
+      <button class="layer active" data-layer="city" aria-pressed="true"><span>▥</span>Город</button>
+      <button class="layer" data-layer="districts" aria-pressed="false"><span>◈</span>Районы</button>
+      <button class="layer" data-layer="green" aria-pressed="false"><span>♧</span>Парки</button>
+    </nav>
+    <div class="map-caption"><span class="crosshair">+</span><span>АСТАНА, КАЗАХСТАН<small id="coords">51.1282° N &nbsp; 71.4304° E</small></span></div>
+    <aside class="panel">
+      <div class="panel-top"><span class="eyebrow">ПУЛЬС ГОРОДА</span><span class="pill">Модель</span></div>
+      <div class="score-line"><strong id="city-score">—</strong><div><span class="score-outof">/ 100</span><span id="score-delta">Исходное состояние</span></div></div>
+      <p class="score-label">Индекс качества жизни</p>
+      <div class="score-track"><span id="score-track"></span></div>
+      <div class="state-switch" aria-label="Состояние города"><button id="before" class="active" aria-pressed="true">Сейчас</button><button id="after" aria-pressed="false">После решений <span>↗</span></button></div>
+      <div class="section-label"><span>РАЙОНЫ</span><span>ИНДЕКС</span></div>
+      <div id="districts"></div>
+      <div class="district-detail"><div class="detail-heading"><span id="district-name">Есиль</span><span id="district-change">Выбранный район</span></div><p id="district-profile"></p><div id="metrics"></div></div>
+      <div class="panel-foot"><span class="dot"></span> Учебная модель · не городская статистика</div>
+    </aside>
+    <div class="view-tools"><button id="tilt" aria-pressed="true" title="Переключить плоскую и объёмную карту">3D</button><button id="home" aria-label="Вернуться к Байтереку" title="К центру города">⌖</button><button id="zoom-in" aria-label="Приблизить">+</button><button id="zoom-out" aria-label="Отдалить">−</button></div>
+    <div class="map-status" id="map-status" role="status">Загружаем городскую геометрию…</div>
+    <section class="scenario">
+      <div class="scenario-lead"><span class="eyebrow">ВАШ ПЛАН</span><h2>Город для каждого</h2><p id="choice-count">Выбрано 0 из 5 мер</p><button id="edit-plan" class="text-button">Выбрать меры →</button></div>
+      <div class="decisions" id="decisions"></div>
+      <div class="budget"><span>БЮДЖЕТ ПЛАНА</span><strong id="budget">0 <small>/ 100</small></strong><div class="budget-track"><i></i></div><span id="budget-rest">100 ед. в резерве</span></div>
+      <button id="apply" class="apply" disabled>Выбрать 5 мер <span>↗</span></button>
+    </section>
+  </main>
+  <footer><span>География OpenStreetMap · высоты могут быть оценочными</span><span>Вращение: правая кнопка мыши · масштаб: колесо</span></footer>
+  <dialog id="plan-dialog" aria-labelledby="plan-title">
+    <div class="dialog-head"><div><span class="eyebrow">100 ЕДИНИЦ · 8 КВАРТАЛОВ</span><h2 id="plan-title">Каким станет ваш город?</h2><p>Выберите пять разных мер и районы, которые получат поддержку.</p></div><button class="close-dialog" data-close="plan-dialog" aria-label="Закрыть выбор мер">×</button></div>
+    <div class="plan-layout"><section aria-label="Каталог мероприятий"><div class="catalog-filter" id="catalog-filter"></div><div id="measure-catalog" class="measure-catalog"></div></section><aside class="plan-summary"><h3>Ваши решения <span id="plan-count">0 / 5</span></h3><div id="selected-plan"></div><div class="plan-total"><span>Расход</span><strong id="plan-budget">0 / 100</strong></div><p id="plan-reserve"></p><p id="plan-error" class="form-error" role="status"></p><button id="calculate-plan" class="apply" disabled>Рассчитать результат →</button><button id="clear-plan" class="text-button">Очистить план</button><details class="rules"><summary>Правила выбора</summary><p>Ровно 5 уникальных мер, не более 2 одного направления. Бюджет — до 100. Несовместимые меры заблокированы.</p><p>Работаем по DOCX. Формулировка PDF о пяти направлениях пока требует уточнения у организаторов.</p><a href="/docs/brief-analysis/dist/sources/dataset.docx">Исходный датасет</a></details></aside></div>
+  </dialog>
+  <dialog id="result-dialog" aria-labelledby="result-title">
+    <div class="dialog-head"><div><span class="eyebrow">РЕЗУЛЬТАТ ВАШЕГО ПЛАНА</span><h2 id="result-title">Астана через восемь кварталов</h2><p>Учебная модель. Изменения рассчитаны сервером по исходному датасету.</p></div><button class="close-dialog" data-close="result-dialog" aria-label="Закрыть результаты">×</button></div>
+    <div class="result-content"><div id="result-overview"></div><div class="result-grid"><section><h3>Что изменилось в районах</h3><div id="district-comparison"></div><label class="metric-picker">Все показатели района<select id="result-district"></select></label><div id="metric-comparison"></div><div id="synergies"></div></section><section class="ai-section"><div class="ai-heading"><h3>Объяснение плана</h3><span id="ai-mode" class="pill"></span></div><div id="ai-output" aria-live="polite"></div><button id="analyze-plan" class="apply">Получить AI-объяснение</button><p class="fine-print">AI выбирает важные проверенные факты. Все числа и Score рассчитывает сервер.</p></section></div><details class="formula"><summary>Как получен Score</summary><p>Score = 0,7 × средневзвешенный балл + 0,3 × балл слабейшего района − число показателей ниже 40.</p><p>Прямые эффекты учитывают лаг: (8 − L) / 8. Синергии фиксированы, показатели ограничены диапазоном 0–100.</p><p id="formula-values"></p></details><div class="result-actions"><button id="change-plan" class="text-button">← Изменить решения</button><a id="open-briefing" class="text-button" href="/briefing/">Сравнить и сохранить отчёт</a><button id="show-on-map" class="apply">Посмотреть на карте ↗</button></div></div>
+  </dialog>
+  <noscript>Для интерактивной карты включите JavaScript.</noscript>
+</body>
+</html>

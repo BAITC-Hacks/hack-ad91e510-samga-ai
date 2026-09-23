@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>АКИМ — панель симулятора</title><link rel="icon" href="./assets/kz-emblem.webp">
+ <link rel="stylesheet" href="./assets/gridstack/gridstack.min.css"><link rel="stylesheet" href="../astana-city/vendor/maplibre-gl.css">
+ <link rel="stylesheet" href="./base.css"><link rel="stylesheet" href="./style.css"><script src="./theme.js"></script>
+</head>
+<body class="panel-page">
+ <a class="skip-link" href="#content">Перейти к панели</a>
+ <div class="page-background page-background--workspace" aria-hidden="true"><div class="page-background__image"></div><div class="page-background__veil"></div><div class="page-background__grid"></div></div>
+ <div class="workspace">
+  <aside class="sidebar" aria-label="Основная навигация">
+   <a class="sidebar__brand" href="./"><img class="sidebar-mark" src="./assets/kz-emblem.webp" alt="Государственный герб Республики Казахстан"><div><b>АКИМ</b><span>Система управления городом</span></div></a>
+   <nav class="sidebar__nav">
+    <a class="nav-link is-active" href="#content" aria-current="location"><i data-icon="layout"></i>Панель управления</a>
+    <a class="nav-link" href="#map-widget"><i data-icon="map"></i>Карта города</a>
+    <a class="nav-link" href="#plan-widget"><i data-icon="plan"></i>План решений</a>
+    <a class="nav-link" href="#compare-widget"><i data-icon="compare"></i>Сравнение вариантов</a>
+   </nav>
+   <div class="sidebar-demo"><div class="sidebar-section-title">Сценарий демонстрации</div><div id="demo-stages"></div></div>
+   <div class="sidebar__foot"><div class="session-note"><span class="session-dot"></span><div>Демонстрационный режим<small>Учебные данные · 5 районов</small></div></div><a class="button button--secondary" href="./"><i data-icon="exit"></i>Экран входа</a></div>
+  </aside>
+  <div class="workspace__body">
+   <header class="workspace__header"><div class="header-title"><h1>Панель симулятора</h1><span class="badge">Астана</span></div><div class="header-tools"><time data-clock></time><button class="header-demo" id="play-demo"><i data-icon="play"></i><span id="play-label">Демонстрация</span></button><button class="icon-button" data-theme-toggle aria-label="Включить светлую тему"></button></div></header>
+   <main class="content" id="content" tabindex="-1">
+    <div class="context-bar panel-context"><label class="scenario-field"><span>Вариант</span><select id="scenario-select" aria-label="Выбрать сценарий"></select></label><div class="context-actions"><button class="compact-button" id="new-plan">Новый план</button><span class="layout-status" id="layout-status" role="status">Виджеты можно перемещать</span><button class="icon-button" id="reset-layout" aria-label="Восстановить расположение виджетов" title="Восстановить расположение виджетов"><i data-icon="layout"></i></button><button class="compact-button" id="next-step">Следующий шаг<i data-icon="next"></i></button></div></div>
+    <section class="demo-brief" aria-live="polite"><span class="brief-index" id="stage-number">01</span><div><strong id="stage-title">Исходная ситуация</strong><p id="stage-copy">Проверьте потребности районов перед распределением бюджета.</p></div><span id="play-status">Ручной режим</span></section>
+    <div class="grid-stack" id="dashboard-grid" aria-label="Виджеты панели">
+     <div class="grid-stack-item" gs-id="budget" gs-x="0" gs-y="0" gs-w="4" gs-h="3">
+      <article class="grid-stack-item-content card metric budget-widget"><div class="card__heading"><i data-icon="budget"></i><h2>Бюджет сценария</h2><span class="widget-status" id="budget-status">Доступно</span></div><div class="metric-main"><strong id="budget-used">0</strong><span>/ 100 ед.</span><small id="budget-free">100 в резерве</small></div><div class="widget-meter"><i id="budget-fill"></i></div><div class="metric-bottom" id="decision-count">0 из 5 решений</div></article>
+     </div>
+     <div class="grid-stack-item" gs-id="score" gs-x="4" gs-y="0" gs-w="4" gs-h="3">
+      <article class="grid-stack-item-content card metric"><div class="card__heading"><i data-icon="activity"></i><h2>Качество жизни</h2><span class="widget-status">Индекс</span></div><div class="metric-main"><strong id="score-value">52,56</strong><span>/ 100</span><small class="score-delta" id="score-delta">Исходный</small></div><div class="score-rail"><span>Сейчас <b id="score-base">52,56</b></span><i></i><span id="score-horizon">Горизонт 2 года</span></div></article>
+     </div>
+     <div class="grid-stack-item" gs-id="critical" gs-x="8" gs-y="0" gs-w="4" gs-h="3">
+      <article class="grid-stack-item-content card metric"><div class="card__heading"><i data-icon="warning"></i><h2>Критические показатели</h2><span class="widget-status">Ниже 40</span></div><div class="metric-main"><strong id="critical-value">2</strong><span id="critical-summary">в районе Нура</span></div><div class="critical-tags" id="critical-tags"></div></article>
+     </div>
+     <div class="grid-stack-item" gs-id="map" gs-x="0" gs-y="3" gs-w="8" gs-h="8">
+      <section class="grid-stack-item-content card map-widget" id="map-widget"><div class="card__heading"><i data-icon="map"></i><h2>Карта города</h2><div class="map-view-toggle"><button id="city-view" aria-pressed="true">3D-город</button><button id="district-view" aria-pressed="false">Районы</button></div></div><div class="widget-map"><div id="map" aria-label="Интерактивная карта Астаны"></div><div class="map-controls"><button id="overview" aria-label="Вернуть обзор карты">⌖</button><button id="zoom-in" aria-label="Приблизить карту">+</button><button id="zoom-out" aria-label="Отдалить карту">−</button></div><span class="map-indication" id="map-indication">Исходное состояние</span><p id="map-status" class="map-status" role="status">Загружаем карту…</p></div><div class="map-widget-foot"><span id="map-foot">Нажмите «Районы», чтобы увидеть распределение проектов.</span><span class="muted">Точки условные</span></div></section>
+     </div>
+     <div class="grid-stack-item" gs-id="plan" gs-x="8" gs-y="3" gs-w="4" gs-h="8">
+      <section class="grid-stack-item-content card plan-widget" id="plan-widget"><div class="card__heading"><i data-icon="plan"></i><h2>Пять решений</h2><span class="widget-status" id="plan-status">Не выбраны</span><button class="widget-add" id="add-measure">+ Мера</button></div><div id="decisions" class="decision-rows"></div><div class="plan-foot"><span id="plan-note">Добавьте первое решение</span><button id="restore-plan" class="text-button" hidden>Очистить</button></div><div id="validation" role="status" hidden></div></section>
+     </div>
+     <div class="grid-stack-item" gs-id="districts" gs-x="0" gs-y="11" gs-w="8" gs-h="10">
+      <section class="grid-stack-item-content card district-widget" id="district-widget"><div class="card__heading"><i data-icon="people"></i><h2>Сравнение районов</h2><div class="period-switch"><button id="show-before" aria-pressed="true">Сейчас</button><button id="show-after" aria-pressed="false" disabled>После решений</button></div></div><div class="district-selection" id="district-selection" aria-label="Выберите районы для сравнения"></div><div class="matrix-caption"><span id="district-caption">Все 10 показателей · 0–100</span><button id="all-districts" class="text-button">Все районы</button></div><div class="matrix-wrap"><table class="district-matrix" id="district-matrix"></table></div><div class="matrix-legend"><span><i class="legend-risk"></i> ! Ниже 40</span><span><i class="legend-loss"></i> Снижение</span><span><i class="legend-change"></i> Было → стало</span><span>0–100 · выше = лучше</span></div></section>
+     </div>
+     <div class="grid-stack-item" gs-id="review" gs-x="8" gs-y="11" gs-w="4" gs-h="10">
+      <section class="grid-stack-item-content card review-widget"><div class="card__heading"><i data-icon="layers"></i><h2>Приоритеты и план</h2><span class="widget-status" id="review-status">Нура</span></div><div class="review-content"><div class="needs-heading"><strong id="needs-title">Низкие показатели Нуры</strong><span>Выберите показатель для подбора мер</span></div><div id="needs-list"></div><div class="plan-checks" id="plan-checks"></div><div id="review-facts"></div><button class="button button--primary recommendation" id="recommendation">Показать неудачный план<i data-icon="arrow"></i></button><span class="review-foot" id="review-foot">Детерминированный расчёт по учебной модели</span></div></section>
+     </div>
+     <div class="grid-stack-item" gs-id="comparison" gs-x="0" gs-y="21" gs-w="12" gs-h="6">
+      <section class="grid-stack-item-content card comparison-widget" id="compare-widget"><div class="card__heading"><i data-icon="compare"></i><h2>Сравнение вариантов</h2><span class="muted">Одинаковый горизонт · 2 года</span></div><div class="table-wrap"><table class="scenario-table"><thead><tr><th>Вариант</th><th>Расходы</th><th>Индекс города</th><th>Критических</th><th>Компромисс</th><th></th></tr></thead><tbody id="comparison-rows"></tbody></table></div><div class="comparison-foot" id="comparison-foot">Первые два плана содержат одинаковые меры. Меняются только районы.</div></section>
+     </div>
+    </div>
+    <footer class="content__foot"><span>АКИМ / SAMGA AI</span><span>Учебная модель · показатели рассчитаны по правилам датасета</span></footer>
+   </main>
+  </div>
+ </div>
+ <dialog id="measure-dialog" class="measure-dialog" aria-labelledby="catalog-title"><div class="catalog-heading"><div><h2 id="catalog-title">Добавить решение</h2><p id="catalog-budget"></p></div><button id="catalog-close" class="icon-button" aria-label="Закрыть каталог">×</button></div><div class="catalog-controls"><label>Место в плане<select id="catalog-slot" aria-label="Добавить или заменить решение"></select></label><label>Район проекта<select id="catalog-district" aria-label="Район мероприятия"></select></label></div><div class="catalog-groups" id="catalog-groups"></div><div id="catalog-need" class="catalog-need" hidden><span id="catalog-need-label"></span><button id="catalog-clear-filter" class="text-button">Снять фильтр</button></div><div id="catalog-message" role="status"></div><div class="catalog-cards" id="catalog-cards"></div><div class="catalog-foot">Изменения индексов показаны на конец двух лет с учётом задержки. Сочетания проектов могут дать дополнительный эффект. Городские меры действуют во всех районах.</div></dialog>
+ <script src="./assets/gridstack/gridstack-all.js"></script><script src="../astana-city/vendor/maplibre-gl.js"></script>
+ <script type="module" src="./shell.mjs"></script><script type="module" src="./widget-layout.mjs"></script><script type="module" src="./app.mjs"></script><script type="module" src="./assistant-bootstrap.mjs"></script>
+ <script type="module" src="./onboarding.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+import { esc } from '../lib/format.mjs';
+import { Icon } from './Icon.mjs';
+export function SceneToolbar(state){
+  const is3D=state.mapMode==='3d';
+  return `<div class="scene-toolbar"><div class="scene-breadcrumb"><button data-action="scene-overview" ${!is3D?'disabled':''}>Астана</button>${is3D&&state.mapFocus?`${Icon('chevron')}<strong>${esc(state.mapFocus)}</strong><span class="scene-level">Кварталы</span>`:'<span class="scene-level">Обзор города</span>'}</div><div class="scene-toolbar-actions"><div class="scene-mode-switch" role="group" aria-label="Режим карты"><button data-action="map-mode" data-mode="3d" class="${is3D?'active':''}" aria-pressed="${is3D}">3D</button><button data-action="map-mode" data-mode="2d" class="${!is3D?'active':''}" aria-pressed="${!is3D}">2D</button></div>${is3D?`<button class="scene-tool ${state.showBuildings?'active':''}" data-action="scene-buildings" aria-label="Показать здания" aria-pressed="${state.showBuildings}" title="Здания">${Icon('city')}</button><button class="scene-tool" data-action="scene-tilt" aria-label="Изменить наклон камеры" title="Наклон камеры">${Icon('layers')}</button>`:''}<button class="scene-tool" data-action="scene-fullscreen" aria-label="Развернуть карту" title="Развернуть карту">${Icon('expand')}</button></div></div>`;
+}

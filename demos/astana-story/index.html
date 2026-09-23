@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="АКИМ — демонстрационный прототип интеллектуальной системы управления городом.">
+  <title>АКИМ — вход</title>
+  <link rel="icon" href="./assets/kz-emblem.webp" type="image/webp">
+  <link rel="stylesheet" href="./base.css">
+  <link rel="stylesheet" href="./login.css?v=akim-emblem-2">
+  <script src="./theme.js"></script>
+</head>
+<body class="akim-login">
+  <a class="skip-link" href="#email">Перейти к форме входа</a>
+  <div class="page-background" aria-hidden="true"><div class="page-background__image"></div><div class="page-background__veil"></div></div>
+  <main class="auth">
+    <header class="auth__top">
+      <div class="akim-government"><strong>Республика Казахстан</strong><span>Цифровая платформа акимата</span></div>
+      <div class="akim-top-tools"><time data-clock></time><span class="akim-language" lang="ru" aria-label="Язык страницы: русский">RU</span></div>
+    </header>
+    <div class="auth__stage">
+      <div class="auth__card">
+        <aside class="auth__brand" aria-label="АКИМ — система управления городом">
+          <span class="akim-brand-context">Цифровой акимат</span>
+          <div class="akim-brand-center">
+            <img class="akim-mark" data-brand-logo src="./assets/kz-emblem.webp" width="176" height="176" alt="Государственный герб Республики Казахстан">
+            <h1 data-brand>АКИМ</h1>
+            <p class="brand-description" data-description>Интеллектуальная система управления городом</p>
+          </div>
+          <div class="akim-brand-foot"><span class="akim-rule" aria-hidden="true"></span><p>Город в едином поле зрения</p></div>
+        </aside>
+        <form class="auth__panel" id="login-form">
+          <div class="akim-form-heading"><h2>Вход в систему</h2><p class="hint">Рабочий кабинет руководителя</p></div>
+          <label class="field" for="email"><span>Электронная почта</span><span class="input-wrap"><i data-icon="user" aria-hidden="true"></i><input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="off" required></span></label>
+          <label class="field" for="password"><span>Пароль</span><span class="input-wrap"><i data-icon="lock" aria-hidden="true"></i><input id="password" name="password" type="password" placeholder="Введите пароль" autocomplete="off" required><button class="peek" id="password-toggle" type="button" aria-label="Показать пароль" aria-pressed="false"><i data-icon="eye" aria-hidden="true"></i></button></span></label>
+          <p id="login-status" class="form-status" role="status" hidden></p>
+          <button class="button button--primary" type="submit">Войти в кабинет <i data-icon="arrow" aria-hidden="true"></i></button>
+          <div class="divider">Знакомство с системой</div>
+          <a class="button button--secondary" href="./main.html"><i data-icon="layout" aria-hidden="true"></i>Открыть демонстрацию</a>
+          <p class="demo-note">Демонстрационная версия. Авторизация не подключена.</p>
+        </form>
+      </div>
+    </div>
+    <footer class="auth__foot"><span class="akim-footer-name"><span data-brand>АКИМ</span><span>Прототип для трека акима</span></span><div class="akim-footer-tools"><span>© <span data-year>2026</span></span><button class="icon-button" data-theme-toggle type="button" aria-label="Включить тёмную тему"><i data-icon="moon" aria-hidden="true"></i></button></div></footer>
+  </main>
+  <script type="module" src="./ui.js?v=akim-emblem-2"></script>
+</body>
+</html>

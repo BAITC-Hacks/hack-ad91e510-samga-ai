@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-23T11:05:41.395Z",
+  "scope": "HTTP/API; не заменяет браузерный проход, проверку на другом ноутбуке и подтверждение сдачи.",
+  "checks": [
+    {
+      "id": "equal-start",
+      "requirement": "Единые исходные данные и бюджет",
+      "status": "passed",
+      "evidence": {
+        "baseline": 52.557680000000005,
+        "critical": 2
+      }
+    },
+    {
+      "id": "official-example",
+      "requirement": "Эталон DOCX воспроизводится",
+      "status": "passed",
+      "evidence": {
+        "score": 56.54306999999999,
+        "cost": 95,
+        "critical": 0
+      }
+    },
+    {
+      "id": "decision-impact",
+      "requirement": "Изменение решений меняет итог",
+      "status": "passed",
+      "evidence": {
+        "sameCost": 95,
+        "reference": 56.54306999999999,
+        "alternative": 53.85654749999999
+      }
+    },
+    {
+      "id": "budget",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "INVALID_SCENARIO"
+      }
+    },
+    {
+      "id": "four-decisions",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "VALIDATION_ERROR"
+      }
+    },
+    {
+      "id": "duplicate",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "INVALID_SCENARIO"
+      }
+    },
+    {
+      "id": "missing-district",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "INVALID_SCENARIO"
+      }
+    },
+    {
+      "id": "city-with-district",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "INVALID_SCENARIO"
+      }
+    },
+    {
+      "id": "incompatible",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "INVALID_SCENARIO"
+      }
+    },
+    {
+      "id": "injected-price",
+      "requirement": "Недопустимый план не получает Score",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "VALIDATION_ERROR"
+      }
+    },
+    {
+      "id": "order",
+      "requirement": "Порядок выбора не меняет результат и идентификатор",
+      "status": "passed",
+      "evidence": {
+        "scenarioId": "docx-8q-v1:edc9a01011babe662fdff4379325ded93ab3931c4ee598540d21cd27b485a9fb"
+      }
+    },
+    {
+      "id": "tamper",
+      "requirement": "Изменённые числа отклоняются до AI-запроса",
+      "status": "passed",
+      "evidence": {
+        "http": 422,
+        "reason": "SCENARIO_MISMATCH"
+      }
+    },
+    {
+      "id": "horizon",
+      "requirement": "Неподтверждённые прогнозы не выдаются за расчёт",
+      "status": "passed",
+      "evidence": {
+        "requestedYears": 10,
+        "reason": "HORIZON_UNSUPPORTED"
+      }
+    },
+    {
+      "id": "exhaustive-search",
+      "requirement": "Оптимальность подтверждена полным поиском в модели",
+      "status": "passed",
+      "evidence": {
+        "validCount": 694395,
+        "score": 57.236734999999996,
+        "cost": 98,
+        "scope": "DOCX, 8 кварталов; оптимальность только для выбранной цели и ограничений"
+      }
+    }
+  ],
+  "liveAi": {
+    "status": "not-run",
+    "reason": "Живой AI не вызван. Шаблоны и mock-тесты не подтверждают этот критерий."
+  },
+  "deterministicPassed": true,
+  "requiredAiVerified": false,
+  "sourceCommit": "e344172",
+  "nodeTests": {
+    "passed": 78,
+    "failed": 0
+  },
+  "pythonLauncherTests": {
+    "passed": 2,
+    "failed": 0
+  },
+  "cleanArchive": {
+    "extractedDirectoryHasSpaces": true,
+    "installedDependencies": false,
+    "forbiddenArchiveFiles": 0
+  }
+}
