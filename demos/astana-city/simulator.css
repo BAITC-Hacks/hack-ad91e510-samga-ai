@@ -24,3 +24,23 @@ dialog{width:min(940px,calc(100vw - 40px));max-height:calc(100dvh - 64px);paddin
  .view-tools{bottom:285px}
  .maplibregl-ctrl-bottom-right{bottom:275px}
 }
+
+/* First visit: one clear action, with exploration tools revealed after the first result. */
+body:not(.has-seen-future) #insights,body:not(.has-seen-future) #strategy,body:not(.has-seen-future) #compare,body:not(.has-seen-future) #overview{display:none}
+.intro{pointer-events:auto;max-width:330px}.intro p{font-size:12px;max-width:320px;color:#c5d6dc}
+.start-planning{display:block;background:var(--accent);color:#17302d;border-radius:9px;padding:13px 17px;margin-top:22px;text-align:left;font-size:13px;font-weight:600;box-shadow:0 6px 28px #09171180}
+.start-planning span{margin-left:18px}.start-planning:hover{background:#e8ffaa}
+.start-hint{display:block;color:#b7cbd0;font-size:10px;margin-top:9px}
+.decision{border-color:#76949480}.decision:hover{border-color:var(--accent);box-shadow:0 0 0 2px #d8f3912b}
+.decision-action{display:block;color:var(--accent);font-size:10px;font-weight:600;border-top:1px solid var(--line);margin-top:7px;padding-top:5px}
+.scenario-lead p{max-width:155px;line-height:1.4}.apply{min-width:158px;line-height:1.5}
+body:not(.has-seen-future) .demo-tag{margin-left:auto}
+@media(max-width:1150px){.decision-action{font-size:9px}.intro{max-width:300px}}
+@media(max-width:850px){.intro{top:115px;max-width:220px}.intro p{font-size:10px;max-width:200px}.start-planning{padding:10px 12px;margin-top:12px;font-size:10px}.start-planning span{margin-left:5px}.start-hint{font-size:8px;max-width:175px}.panel{bottom:300px;max-height:calc(100dvh - 520px)}.view-tools{bottom:305px}.maplibregl-ctrl-bottom-right{bottom:295px}}
+@media(max-width:600px){.intro{top:118px}.intro h1{font-size:23px}.intro p{line-height:1.4}.start-planning{margin-top:9px}.decision-action{font-size:9px}.decision-name{min-height:29px}.panel{bottom:304px;max-height:calc(100dvh - 525px)}}
+
+/* Keep the map controls clear of the first-step action. */
+.layer-bar{top:410px}
+@media(max-width:850px){.layer-bar{top:355px}.view-tools{top:435px;bottom:auto;left:18px;right:auto;flex-direction:row}.view-tools button{width:30px;height:30px;font-size:15px}}
+@media(max-width:600px){.intro p{max-width:145px}.start-planning{width:145px}.start-hint{max-width:145px}.layer-bar{top:355px}.view-tools{top:430px;bottom:auto;left:18px;right:auto;flex-direction:row}.view-tools button{width:28px;height:28px;font-size:14px}}
+@media(max-width:600px){.scenario-lead::before{content:"ПРОЕКТЫ · ЛИСТАЙТЕ →"}}

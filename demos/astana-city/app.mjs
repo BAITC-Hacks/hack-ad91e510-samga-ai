@@ -11,7 +11,7 @@ if (result.errors.length) throw new Error(result.errors.join('; '));
 const codes = {Есиль:'KZ711210',Алматы:'KZ711110',Сарыарка:'KZ711310',Байконур:'KZ711410',Нура:'KZ711510',Сарайшық:'KZ711610'};
 const viewpoints = {Есиль:[71.433,51.126],Алматы:[71.479,51.157],Сарыарка:[71.408,51.182],Байконур:[71.447,51.192],Нура:[71.395,51.125],Сарайшық:[71.511,51.117]};
 const metricKeys = [['T2','Транспорт'],['E1','Озеленение'],['S1','Образование']];
-let mode = 'before', selected = 'Есиль', activeLayer = 'city', mapReady = false;
+let mode = 'before', selected = 'Есиль', activeLayer = 'city', mapReady = false, hasSeenFuture = false;
 let map, districtGeo;
 const signed = n => (n>0?'+':'')+number(n);
 const number = n => n.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1});
@@ -36,11 +36,14 @@ function render(){
   $('district-change').textContent=d&&mode==='after'?`${signed(d.score-b.score)} к индексу`:'Выбранный район';
   $('district-profile').textContent=baseline.districts.find(x=>x.name===selected)?.profile??'Для этого района нет показателей в учебном датасете.';
   $('metrics').innerHTML=d?metricKeys.map(([key,label])=>`<div class="metric"><span>${label}</span><span class="metric-bar"><i style="width:${d.values[key]}%"></i></span><b>${Math.round(d.values[key])}</b></div>`).join(''):'';
-  $('apply').innerHTML=mode==='before'?'Посмотреть будущее <span>↗</span>':'Вернуться к настоящему <span>↶</span>';
+  $('apply').innerHTML=mode==='before'?'2 · Показать город через 2 года <span>↗</span>':'Вернуться к выбору <span>↶</span>';
+  if(mode==='after')hasSeenFuture=true;document.body.classList.toggle('has-seen-future',hasSeenFuture);
+  $('start-planning').innerHTML=mode==='before'?'1 · Изменить решения <span>↘</span>':'3 · Сравнить варианты <span>↗</span>';
   if(mapReady) updateDistricts();
   document.querySelector('.intro .eyebrow').textContent=mode==='before'?'АКИМ НА 5 ЧАСОВ · ШАГ 1 ИЗ 2':'АКИМ НА 5 ЧАСОВ · ШАГ 2 ИЗ 2';
   document.querySelector('.intro h1').innerHTML=mode==='before'?'На что потратим<br><span>100 единиц?</span>':'Что изменилось<br><span>через два года?</span>';
-  document.querySelector('.intro p').textContent=mode==='before'?'Выберите пять решений и посмотрите последствия для города через два года.':'Сравните районы на карте, откройте показатели и проверьте другую гипотезу.';
+  document.querySelector('.intro p').textContent=mode==='before'?'Перед вами стартовый план. Замените любой проект или сразу посмотрите его последствия.':'Сравните районы на карте. Вверху доступны анализ и поиск другого плана.';
+  document.querySelector('.start-hint').textContent=mode==='before'?'Пять карточек проектов — внизу экрана':'Сейчас ↔ Через 2 года — справа';
   $('after').title='Расчёт по модели организаторов: 8 кварталов. Для 1, 5 и 10 лет нет калиброванных данных.';
 }
 function setMode(value){mode=value;render();}

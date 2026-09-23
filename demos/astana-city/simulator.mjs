@@ -29,7 +29,7 @@ export function mountSimulator({getState,updatePlan,showImpact}){
   $('decisions').replaceChildren(...choices.map((c,index)=>{
    const m=measures.find(m=>m.id===c.id),button=document.createElement('button');
    button.className='decision';button.setAttribute('aria-label','Изменить проект '+(index+1)+': '+titles[c.id]);
-   button.innerHTML='<span class="decision-top"><span class="decision-icon">'+icons[m.group]+'</span><span class="decision-group">'+shortGroups[m.group]+'</span><span class="edit-mark">↗</span></span><span class="decision-name">'+titles[c.id]+'</span><span class="decision-district">'+(c.district??'Весь город')+'</span><span class="decision-price">'+m.cost+' ед.</span>';
+   button.innerHTML='<span class="decision-top"><span class="decision-icon">'+icons[m.group]+'</span><span class="decision-group">'+shortGroups[m.group]+'</span><span class="edit-mark">↗</span></span><span class="decision-name">'+titles[c.id]+'</span><span class="decision-district">'+(c.district??'Весь город')+'</span><span class="decision-price">'+m.cost+' ед.</span><span class="decision-action">Изменить ↗</span>';
    button.onclick=()=>edit(index);return button;
   }));
   $('budget').textContent=result.cost;
@@ -171,6 +171,7 @@ export function mountSimulator({getState,updatePlan,showImpact}){
   for(const name of ['facts','evidence','assistant'])$(name+'-tab').onclick=()=>tab(name);
   tab('facts');
  }
+ $('start-planning').onclick=()=>getState().mode==='before'?edit(0):comparison();
  $('all-metrics').onclick=metricTable;$('compare').onclick=comparison;$('strategy').onclick=strategies;$('insights').onclick=insights;
  return {renderPlan};
 }
