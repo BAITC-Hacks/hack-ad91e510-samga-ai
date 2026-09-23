@@ -3,14 +3,17 @@ import { GlassTabBar, tabs } from './components/GlassTabBar.mjs';
 import { Icon } from './components/Icon.mjs';
 import { Home } from './screens/Home.mjs';
 import { Decisions } from './screens/Decisions.mjs';
+import { Districts } from './screens/Districts.mjs';
+import { Result } from './screens/Result.mjs';
 import { DistrictSheet } from './components/DistrictSheet.mjs';
+import { AIInsightCard } from './components/AIInsightCard.mjs';
 import { selectionReason, restoreChoices, STORAGE_KEY } from './lib/scenario.mjs';
 import { esc } from './lib/format.mjs';
 import { animateNumbers, haptic } from './lib/motion.mjs';
 
 const app = document.querySelector('#app');
-export const state = { data:null, choices:[], view:'home', group:'all', result:null, analysis:null, busy:false, analysisBusy:false, analysisError:'' };
-const screens = { home:Home, decisions:Decisions };
+export const state = { data:null, choices:[], view:'home', group:'all', district:'Есиль', result:null, analysis:null, busy:false, analysisBusy:false, analysisError:'', animateResult:false };
+const screens = { home:Home, decisions:Decisions, districts:Districts, result:Result };
 const sheet = document.querySelector('#sheet');
 let scenarioRevision = 0;
 export function render() {
@@ -18,6 +21,7 @@ export function render() {
   const view = screens[state.view] ?? Home;
   app.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand" href="#home" aria-label="SAMGA AI — Сегодня"><span class="brand-mark">${Icon('city')}</span><span>SAMGA<span class="brand-ai"> AI</span></span></a><div class="topbar-right"><span class="session-label"><i class="status-dot"></i>${state.data.demo ? 'Демо-сценарий' : 'Городской симулятор'}</span><button class="icon-button" data-action="about" aria-label="О симуляторе">${Icon('info')}</button></div></header><main id="content" tabindex="-1">${view(state)}</main><footer class="app-footer"><span>SAMGA AI</span><span>Ваш взгляд на будущее Астаны</span></footer></div>${GlassTabBar(state.view)}`;
   animateNumbers(app);
+  if (state.view === 'result' && state.result) state.animateResult = false;
   if (focused) app.querySelector(`[data-focus="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
 }
 function navigate() {
@@ -55,16 +59,24 @@ async function calculate() {
     if (revision !== scenarioRevision) return;
     if (!Number.isFinite(result.score) || result.districts?.length !== 5) throw new Error('Сервер не передал корректный результат.');
     state.result = result; state.analysis = null; state.analysisError = ''; state.animateResult = true;
-    haptic(); location.hash = 'result';
+    state.busy = false; state.analysisBusy = true;
+    haptic(); state.view = 'result'; history.pushState(null,'','#result');
+    render(); window.scrollTo({top:0,behavior:'instant'}); document.querySelector('#content').focus({preventScroll:true});
     analyze(choices, revision);
   } catch (error) { toast(error.message); }
-  finally { state.busy = false; render(); }
+  finally { if (state.busy) { state.busy = false; render(); } }
+}
+function renderAnalysis() {
+  if (state.view === 'result' && state.result) {
+    const card = document.querySelector('.ai-card');
+    if (card) card.outerHTML = AIInsightCard(state);
+  }
 }
 async function analyze(choices = structuredClone(state.choices), revision = scenarioRevision) {
-  state.analysisBusy = true; state.analysisError = ''; render();
+  state.analysisBusy = true; state.analysisError = ''; renderAnalysis();
   try { const analysis = await cityService.analyze(choices); if (revision === scenarioRevision) state.analysis = analysis; }
   catch (error) { if (revision === scenarioRevision) state.analysisError = error.message; }
-  finally { if (revision === scenarioRevision) { state.analysisBusy = false; render(); } }
+  finally { if (revision === scenarioRevision) { state.analysisBusy = false; renderAnalysis(); } }
 }
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-action]');
@@ -74,6 +86,7 @@ document.addEventListener('click', event => {
   if (action === 'retry-boot') boot();
   if (!state.data) return;
   if (action === 'filter') { state.group = group; render(); }
+  if (action === 'district' && state.data.districts.some(d => d.name === district)) { state.district = district; render(); }
   if (action === 'pick' && !state.busy) {
     const measure = state.data.measures.find(m => m.id === id);
     if (!measure) return;
