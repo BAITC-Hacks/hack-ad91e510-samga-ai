@@ -1,3 +1,4 @@
+import {defaultSelection} from '../../analytics/grounding.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
@@ -6,7 +7,7 @@ import {analyze,demoAnalysis} from '../ai.mjs';
 import {validateRequest} from '../contracts.mjs';
 import {runSimulation} from '../simulator-adapter.mjs';
 import {scenarios} from '../../docs/brief-analysis/dist/data.mjs';
-const payload=()=>runSimulation(scenarios[0].choices);
+const payload=()=>runSimulation(scenarios[0].choices); const pick=()=>defaultSelection(payload());
 const completed=analysis=>({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(analysis)}]}]});
 const options=fetchImpl=>({apiKey:'test-key-not-real',model:'test-model',fetchImpl});
 async function server(t,config={mode:'demo'}) {
@@ -35,17 +36,17 @@ test('AI transport uses strict schema and receives unchanged simulator numbers',
   const p=payload();let sent;
   const result=await analyze(p,options(async(url,init)=>{
     assert.equal(url,'https://api.openai.com/v1/responses');sent=JSON.parse(init.body);
-    return Response.json(completed(demoAnalysis()));
+    return Response.json(completed(pick()));
   }));
   assert.equal(sent.store,false);assert.equal(sent.text.format.strict,true);
   assert.deepEqual(JSON.parse(sent.input).simulation,p);
   assert.equal(Object.hasOwn(result.analysis,'score'),false);
 });
-test('HTTP numeric score comes only from simulator payload',async t=>{
-  const post=await server(t,options(async()=>Response.json(completed(demoAnalysis()))));
+test('HTTP rejects client-forged score before any AI call',async t=>{
+  const post=await server(t,options(async()=>Response.json(completed(pick()))));
   const p=payload();p.result.score=54.123456789;
   const r=await post('/api/analyze',p);
-  assert.equal(r.status,200);assert.equal(r.body.score,54.123456789);
+  assert.equal(r.status,422);assert.equal(r.body.error.code,'SCENARIO_MISMATCH');
 });
 test('reject missing, nonfinite, extra fields and duplicate districts',()=>{
   for (const mutate of [p=>delete p.result.score,p=>p.result.score=NaN,p=>p.result.extra=1,
@@ -112,7 +113,7 @@ test('health, schemas, unknown route and wrong method',async t=>{
 });
 test('AI concurrency limit returns 429 and releases slots after completion',async t=>{
   const releases=[];
-  const post=await server(t,options(async()=>new Promise(resolve=>releases.push(()=>resolve(Response.json(completed(demoAnalysis())))))));
+  const post=await server(t,options(async()=>new Promise(resolve=>releases.push(()=>resolve(Response.json(completed(pick())))))));
   const first=post('/api/analyze',payload()), second=post('/api/analyze',payload());
   for (let i=0;i<100 && releases.length<2;i++) await new Promise(r=>setTimeout(r,5));
   assert.equal(releases.length,2);

@@ -29,6 +29,8 @@ export const analysisSchema = object({
 });
 // Implements only the JSON Schema keywords used above.
 export function validateSchema(value,schema,path='$') {
+  if (schema.anyOf) return schema.anyOf.some(s=>validateSchema(value,s,path).length===0)?[]:[path+': no matching variant'];
+  if (schema.type==='null') return value===null?[]:[path+': expected null'];
   const errors=[];
   const valid = schema.type==='object' ? value!==null && typeof value==='object' && !Array.isArray(value)
     : schema.type==='array' ? Array.isArray(value)
